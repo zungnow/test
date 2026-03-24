@@ -366,6 +366,10 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
         <div class="panel-title">📢 알림</div>
         <div id="logEntries" style="display:flex;flex-direction:column;gap:3px;"></div>
       </div>
+      <div class="panel">
+  <div class="panel-title">🗺️ 성장 로드맵</div>
+  <div id="stageRoadmap" style="display:flex;flex-direction:column;gap:4px;"></div>
+</div>
     </div>
 
     <!-- CENTER -->
@@ -1322,7 +1326,14 @@ function updateHeader() {
   document.getElementById('dayDisplay').textContent=G.day;
   document.getElementById('stageBadge').textContent=STAGE_DATA[G.stage].name;
   document.getElementById('brandIcon').textContent=STAGE_DATA[G.stage].building;
-}
+  // 
+  const roadmap = document.getElementById('stageRoadmap');
+  if (roadmap) {
+    roadmap.innerHTML = STAGE_DATA.map((s, i) => {
+      ...
+    }).join('');
+  }
+  }
 
 function renderFarm() {
   const sm=G.upgrades.includes('fertilizer')?0.7:1;
