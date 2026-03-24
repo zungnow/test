@@ -1361,7 +1361,7 @@ function updateHeader() {
         opacity:${locked?0.3:1};font-weight:${current?700:400};
         color:${current?'var(--espresso)':'var(--soil)'};">
         <span>${done?'✅':current?'▶️':'⬜'}</span>
-        <span>${s.building} ${s.name.replace(/^.\s*/,'')}</span>
+        <span>${s.name}</span>
         ${current?'<span style="font-size:9px;background:var(--gold);color:white;padding:1px 6px;border-radius:8px;margin-left:auto;">현재</span>':
           !done&&!locked?`<span style="font-size:9px;color:var(--latte);margin-left:auto;">${s.repReq.toLocaleString()}</span>`:''}
       </div>`;
