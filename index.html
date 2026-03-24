@@ -361,6 +361,14 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   <div id="game-main">
     <!-- LEFT -->
     <div id="col-farm" class="tab-show">
+
+      <!-- 모바일 전용: 카페 오픈 후 방문손님 미니패널 -->
+      <div id="mob-cust-panel" style="display:none;">
+        <div style="background:linear-gradient(135deg,var(--espresso),#5C3A1E);border-radius:12px;padding:10px 12px;">
+          <div style="font-size:11px;color:rgba(255,248,240,0.65);font-weight:700;margin-bottom:6px;">👥 방문 손님 <span id="mob-cust-count"></span></div>
+          <div id="mob-cust-list"><div style="font-size:12px;color:rgba(255,248,240,0.45);text-align:center;">손님을 기다리는 중...</div></div>
+        </div>
+      </div>
       <div class="panel">
         <div class="panel-title">🌾 농장</div>
         <div class="season-strip">
@@ -482,20 +490,20 @@ const CROPS = {
   wheat:    {emoji:'🌾',name:'밀',      growTime:20, cost:500,  yield:10, gives:'wheat'},
   strawb:   {emoji:'🍓',name:'딸기',    growTime:30, cost:1000, yield:8,  gives:'strawb'},
   peach:    {emoji:'🍑',name:'복숭아',  growTime:45, cost:1000, yield:8,  gives:'peach'},
-  bean:     {emoji:'🫘',name:'커피콩',  growTime:50, cost:2500, yield:15, gives:'bean'},
+  bean:     {emoji:'🫘',name:'커피콩',  growTime:40, cost:2500, yield:15, gives:'bean'},
   milk_c:   {emoji:'🥛',name:'유제품',  growTime:25, cost:3000, yield:10,  gives:'milk'},
   sugar_c:  {emoji:'🍬',name:'설탕수수',growTime:15, cost:1500, yield:25, gives:'sugar'},
   // 2단계 이후
   egg_c:    {emoji:'🥚',name:'달걀',    growTime:20, cost:800,  yield:12, gives:'egg'},
    // 4단계 이후
   potato_c: {emoji:'🥔',name:'감자',    growTime:35, cost:1200, yield:10, gives:'potato'},
-  tomato_c: {emoji:'🍅',name:'토마토',  growTime:40, cost:1500, yield:8,  gives:'tomato'},
-  mushroom_c:{emoji:'🍄',name:'버섯',   growTime:50, cost:2000, yield:6,  gives:'mushroom'},
+  tomato_c: {emoji:'🍅',name:'토마토',  growTime:30, cost:1500, yield:8,  gives:'tomato'},
+  mushroom_c:{emoji:'🍄',name:'버섯',   growTime:30, cost:2000, yield:6,  gives:'mushroom'},
   // 6단계 이후
-  meat_c:   {emoji:'🥩',name:'고기',    growTime:60, cost:5000, yield:5,  gives:'meat'},
+  meat_c:   {emoji:'🥩',name:'고기',    growTime:40, cost:5000, yield:5,  gives:'meat'},
   basil_c:  {emoji:'🌿',name:'허브',    growTime:30, cost:2000, yield:10, gives:'basil'},
   // 8단계 이후
-  truffle_c:{emoji:'⚫',name:'트러플',  growTime:90, cost:15000,yield:8,  gives:'truffle'},
+  truffle_c:{emoji:'⚫',name:'트러플',  growTime:50, cost:6000,yield:8,  gives:'truffle'},
   cream_c:  {emoji:'🍶',name:'생크림',  growTime:35, cost:4000, yield:10,  gives:'cream'},
 };
 
@@ -512,14 +520,14 @@ truffle: {name:'트러플', emoji:'⚫'}, cream:   {name:'생크림',emoji:'🍶
 // stageReq: 0=농장, 1=노점, 2=토스트점, 3=분식점, 4=카페, 5=디저트카페, 6=비스트로, 7=레스토랑, 8=파인다이닝, 9=프랜차이즈
 const RECIPES = {
   // ── 1단계: 노점 ──
-  egg_toast:    {emoji:'🍳',name:'계란 토스트',   price:2000, stageReq:1, ingredients:{wheat:1,egg:1},              learnCost:0,    season:null,     reviews:['든든해요!','아침에 딱!','따뜻하고 맛있어요~']},
+  egg_toast:    {emoji:'🍳',name:'계란 토스트',   price:4000, stageReq:1, ingredients:{wheat:1,egg:1},              learnCost:0,    season:null,     reviews:['든든해요!','아침에 딱!','따뜻하고 맛있어요~']},
   hotteok:      {emoji:'🥞',name:'호떡',          price:2500, stageReq:1, ingredients:{wheat:1,sugar:1},            learnCost:500,  season:null,     reviews:['달콤해요!','길거리 감성~','바삭하고 맛있어요!']},
   // ── 2단계: 토스트점 ──
-  ham_toast:    {emoji:'🥪',name:'햄치즈 토스트', price:3500, stageReq:2, ingredients:{wheat:1,egg:1,milk:1},       learnCost:1000, season:null,     reviews:['치즈가 쭉쭉~','든든해요!','점심으로 딱!']},
-  strawb_toast: {emoji:'🍓',name:'딸기잼 토스트', price:3000, stageReq:2, ingredients:{wheat:1,strawb:1,sugar:1},   learnCost:800,  season:null,     reviews:['달콤해요!','향기가 좋아요~','아이들이 좋아해요!']},
+  ham_toast:    {emoji:'🥪',name:'햄치즈 토스트', price:4500, stageReq:2, ingredients:{wheat:1,egg:1,milk:1},       learnCost:1000, season:null,     reviews:['치즈가 쭉쭉~','든든해요!','점심으로 딱!']},
+  strawb_toast: {emoji:'🍓',name:'딸기잼 토스트', price:5000, stageReq:2, ingredients:{wheat:1,strawb:1,sugar:1},   learnCost:800,  season:null,     reviews:['달콤해요!','향기가 좋아요~','아이들이 좋아해요!']},
   plain_cookie: {emoji:'🍪',name:'플레인 쿠키',   price:2500, stageReq:2, ingredients:{wheat:1,sugar:1,egg:1},      learnCost:500,  season:null,     reviews:['바삭해요!','고소한 냄새~','커피랑 잘 어울려요!']},
   // ── 3단계: 분식점 ──
-  tteokbokki:   {emoji:'🌶️',name:'떡볶이',       price:4000, stageReq:3, ingredients:{wheat:2,tomato:1,sugar:1},   learnCost:2000, season:null,     reviews:['매콤달콤!','중독적이에요~','또 먹고 싶어요!']},
+  tteokbokki:   {emoji:'🌶️',name:'떡볶이',       price:5000, stageReq:3, ingredients:{wheat:2,tomato:1,sugar:1},   learnCost:2000, season:null,     reviews:['매콤달콤!','중독적이에요~','또 먹고 싶어요!']},
   kimbap:       {emoji:'🍙',name:'김밥',          price:4500, stageReq:3, ingredients:{wheat:1,egg:1,mushroom:1},   learnCost:2000, season:null,     reviews:['꽉 찬 속재료!','소풍 필수템~','집밥 느낌!']},
   sundae:       {emoji:'🌭',name:'순대',           price:3500, stageReq:3, ingredients:{meat:1,wheat:1},             learnCost:1500, season:null,     reviews:['쫄깃해요!','분식집 느낌~','고소해요!']},
   // ── 4단계: 카페 ──
@@ -1526,20 +1534,60 @@ function renderReviews() {
     </div>`).join('');
 }
 
-// ── 모바일 탭 전환 (CSS class 토글만, 기존 JS 무관) ──
+// ── 모바일 탭 전환 ──
 function mobTab(t) {
   ['farm','cafe','manage'].forEach(function(n) {
     var col = document.getElementById('col-'+n);
     var btn = document.getElementById('mbt-'+n);
-    if (col) { col.classList.remove('tab-show'); }
-    if (btn) { btn.classList.remove('on'); }
+    if (col) col.classList.remove('tab-show');
+    if (btn) btn.classList.remove('on');
   });
   var c = document.getElementById('col-'+t);
   var b = document.getElementById('mbt-'+t);
-  if (c) { c.classList.add('tab-show'); }
-  if (b) { b.classList.add('on'); }
+  if (c) c.classList.add('tab-show');
+  if (b) b.classList.add('on');
   window.scrollTo(0, 0);
 }
+
+// ── 모바일 방문손님 미니패널 업데이트 (1초마다) ──
+setInterval(function() {
+  if (window.innerWidth > 768) return;
+  var panel = document.getElementById('mob-cust-panel');
+  if (!panel) return;
+
+  // 카페 오픈 전엔 숨김
+  if (!G.cafeOpen) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  var countEl = document.getElementById('mob-cust-count');
+  if (countEl) countEl.textContent = '(' + G.customers.length + '명)';
+
+  var list = document.getElementById('mob-cust-list');
+  if (!list) return;
+
+  if (!G.customers || G.customers.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:rgba(255,248,240,0.45);text-align:center;">손님을 기다리는 중...</div>';
+    return;
+  }
+
+  list.innerHTML = G.customers.map(function(c) {
+    var recipe = RECIPES[c.order] || {};
+    var pc = c.patience > 60 ? '#5A8A3C' : c.patience > 30 ? '#F4C430' : '#e74c3c';
+    var td = SPECIAL_TYPES[c.type];
+    var tag = td ? '<span style="font-size:9px;background:rgba(255,255,255,0.15);color:white;padding:1px 5px;border-radius:5px;margin-left:3px;">' + td.label + '</span>' : '';
+    return '<div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.08);border-radius:8px;padding:6px 9px;margin-bottom:4px;">' +
+      '<span style="font-size:20px;">' + c.emoji + '</span>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:11px;font-weight:600;color:white;">' + c.name + tag + '</div>' +
+        '<div style="font-size:10px;color:rgba(255,248,240,0.6);">' + (recipe.emoji||'') + ' ' + (recipe.name||'') + '</div>' +
+        '<div style="height:3px;background:rgba(255,255,255,0.15);border-radius:2px;margin-top:3px;">' +
+          '<div style="height:100%;width:' + c.patience + '%;background:' + pc + ';border-radius:2px;"></div>' +
+        '</div>' +
+      '</div>' +
+      '<button onclick="serveCustomer(' + c.id + ',false,\'\')" style="background:#5A8A3C;color:white;border:none;border-radius:7px;padding:4px 9px;font-size:11px;cursor:pointer;font-family:\'Gowun Dodum\',sans-serif;font-weight:600;">서빙</button>' +
+    '</div>';
+  }).join('');
+}, 1000);
 </script>
 </body>
 </html>
