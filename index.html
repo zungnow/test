@@ -195,54 +195,78 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
 
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(200,149,108,0.4);border-radius:3px}
 
-/* ───────────────────────────────
-   모바일 반응형 (768px 이하)
-─────────────────────────────── */
+/* ─────────────────────────────────────
+   모바일 전용 추가 스타일 (768px 이하)
+   JS 변경 없음 — CSS만
+───────────────────────────────────── */
 @media (max-width: 768px) {
 
-  /* 하단 탭바 공간 확보 */
-  #app { padding: 8px 8px 72px; gap: 6px; }
+  /* ① 원래 헤더 숨기고 고정 상단바로 대체 */
+  header { display: none !important; }
 
-  /* 헤더 압축 */
-  header { padding: 8px 12px; gap: 8px; border-radius: 12px; }
-  .brand-name { font-size: 15px; }
-  .brand-sub, #season-badge { display: none; }
-  .stage-badge { font-size: 11px; padding: 3px 8px; }
-  .stats-bar { gap: 8px; }
-  .stat { font-size: 12px; }
-  #game-time { font-size: 11px; padding: 2px 7px; }
-  .header-btns { display: none; } /* 저장은 탭바에서 */
-
-  /* 3열 그리드 해제 */
-  #game-main { display: block; }
-
-  /* 각 열: 기본 숨김 */
-  #col-farm, #col-cafe, #col-manage {
-    display: none;
-    flex-direction: column;
-    gap: 8px;
+  /* ② 고정 상단 미니바 */
+  #mob-topbar {
+    display: flex !important;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 998;
+    background: rgba(255,248,240,0.97);
+    border-bottom: 2px solid rgba(200,149,108,0.22);
+    box-shadow: 0 2px 10px rgba(59,31,15,0.1);
+    padding: 7px 12px;
+    align-items: center; gap: 8px;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  #mob-topbar-brand {
+    font-size: 13px; font-weight: 800; color: var(--espresso);
+    flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mob-stat { font-size: 12px; font-weight: 600; color: var(--espresso); white-space: nowrap; }
+  #mob-topbar-time {
+    font-size: 12px; font-weight: 700; color: var(--soil);
+    background: rgba(107,66,38,0.1); padding: 2px 8px; border-radius: 8px;
+    white-space: nowrap;
   }
 
-  /* 활성 열만 표시 */
-  #col-farm.tab-show   { display: flex; }
-  #col-cafe.tab-show   { display: flex; }
-  #col-manage.tab-show { display: flex; }
+  /* ③ 앱 여백: 상단바(44px) + 하단탭바(64px) */
+  #app { padding: 52px 8px 72px !important; gap: 6px; }
 
-  /* 밭 크게 */
+  /* ④ 농장탭 손님 미니패널 */
+  #mob-order-panel {
+    display: none;
+    flex-direction: column; gap: 6px;
+    background: linear-gradient(135deg, var(--espresso), #5C3A1E);
+    border-radius: 12px; padding: 10px 12px;
+  }
+  #mob-order-panel.mob-visible { display: flex; }
+  .mob-op-title { font-size: 11px; color: rgba(255,248,240,0.65); font-weight: 700; }
+  .mob-op-item {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.08); border-radius: 8px;
+    padding: 6px 8px; color: var(--cream); font-size: 12px;
+  }
+  .mob-op-avatar { font-size: 18px; flex-shrink: 0; }
+  .mob-op-info { flex: 1; min-width: 0; }
+  .mob-op-name { font-weight: 600; font-size: 11px; }
+  .mob-op-order { font-size: 10px; color: rgba(255,248,240,0.6); }
+  .mob-op-pat { height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; margin-top: 3px; }
+  .mob-op-pat-fill { height: 100%; border-radius: 2px; }
+  .mob-op-empty { font-size: 12px; color: rgba(255,248,240,0.45); text-align: center; padding: 2px 0; }
+
+  /* ⑤ 기존 3열 → 단일 블록 */
+  #game-main { display: block; }
+  #col-farm, #col-cafe, #col-manage { display: none; flex-direction: column; gap: 8px; }
+  #col-farm.tab-show, #col-cafe.tab-show, #col-manage.tab-show { display: flex; }
+
+  /* ⑥ 터치 최적화 */
   .plot { font-size: 26px; }
   .plot-label { font-size: 10px; }
-
-  /* 인벤토리 3열 */
   .inv-grid { grid-template-columns: repeat(3, 1fr); }
-
-  /* 메뉴 4열 */
   .menu-grid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
   .menu-icon { font-size: 20px; }
   .menu-name { font-size: 9px; }
 
-  /* 하단 탭바 */
+  /* ⑦ 하단 탭바 */
   #mob-bar {
-    display: flex;
+    display: flex !important;
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
     background: rgba(255,248,240,0.98);
     border-top: 2px solid rgba(200,149,108,0.25);
@@ -253,8 +277,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
     padding: 6px 2px; border: none; border-radius: 10px;
     background: transparent; cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: background 0.1s;
+    -webkit-tap-highlight-color: transparent; transition: background 0.1s;
   }
   .mbt.on { background: rgba(107,66,38,0.1); }
   .mbt-i { font-size: 22px; line-height: 1; }
@@ -262,14 +285,10 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   .mbt.on .mbt-l { color: var(--espresso); }
 }
 
-/* 데스크탑: 탭바 숨김, 모든 열 표시 */
+/* 데스크탑: 모바일 요소 완전 숨김 */
 @media (min-width: 769px) {
-  #mob-bar { display: none; }
-  #col-farm, #col-cafe, #col-manage {
-    display: flex !important;
-    flex-direction: column;
-    gap: 8px;
-  }
+  #mob-bar, #mob-topbar, #mob-order-panel { display: none !important; }
+  #col-farm, #col-cafe, #col-manage { display: flex !important; flex-direction: column; gap: 8px; }
 }
 </style>
 </head>
@@ -278,7 +297,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
 <!-- MODALS -->
 <div class="modal-overlay" id="nameModal">
   <div class="modal">
-    <div class="modal-title">🌱 나만의 카페 시작하기</div>
+    <div class="modal-title">🌱 카페 오픈</div>
     <div class="modal-body">
       <p style="text-align:center;color:var(--latte);font-size:13px;margin-bottom:14px;">농장을 키우고, 재료를 모아<br>나만의 카페를 열어보세요!</p>
       <input class="input-field" id="brandInput" placeholder="브랜드 이름 (예: 햇살농장 카페)" maxlength="20">
@@ -311,6 +330,17 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   </div>
 </div>
 
+<!-- 모바일 고정 상단바 (데스크탑에선 CSS로 숨김) -->
+<div id="mob-topbar">
+  <div id="mob-topbar-brand">🌱 내 농장</div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span class="mob-stat">💰<span id="mob-money">0</span></span>
+    <span class="mob-stat">⭐<span id="mob-rep">0</span></span>
+    <span class="mob-stat">Day <span id="mob-day">1</span></span>
+  </div>
+  <div id="mob-topbar-time">00:00</div>
+</div>
+
 <!-- APP -->
 <div id="app">
   <header>
@@ -321,7 +351,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
     <div id="season-badge">🌸 봄</div>
     <div class="stage-badge" id="stageBadge">🌱 농장 단계</div>
     <div class="stats-bar">
-      <div class="stat">💰 <span id="moneyDisplay">500000</span>원</div>
+      <div class="stat">💰 <span id="moneyDisplay">100000</span>원</div>
       <div class="stat">⭐ <span id="repDisplay">0</span></div>
       <div class="stat">📅 Day <span id="dayDisplay">1</span></div>
       <div id="game-time">00:00</div>
@@ -335,6 +365,12 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   <div id="game-main">
     <!-- LEFT -->
     <div id="col-farm" class="tab-show" style="display:flex;flex-direction:column;gap:8px;">
+
+      <!-- 모바일 전용: 카페 오픈 후 손님 주문 미니 패널 -->
+      <div id="mob-order-panel">
+        <div class="mob-op-title">☕ 대기 손님</div>
+        <div id="mob-op-list"><div class="mob-op-empty">손님 없음</div></div>
+      </div>
       <div class="panel">
         <div class="panel-title">🌾 농장</div>
         <div class="season-strip">
@@ -447,12 +483,12 @@ const SEASONS = [
 ];
 
 const CROPS = {
-  wheat:   {emoji:'🌾',name:'밀',      growTime:20,cost:2000,yield:3,gives:'wheat'},
-  strawb:  {emoji:'🍓',name:'딸기',    growTime:30,cost:4000,yield:2,gives:'strawb'},
-  peach:   {emoji:'🍑',name:'복숭아',  growTime:45,cost:5500,yield:2,gives:'peach'},
-  bean:    {emoji:'🫘',name:'커피콩',  growTime:50,cost:6500,yield:2,gives:'bean'},
-  milk_c:  {emoji:'🥛',name:'유제품',  growTime:25,cost:3000,yield:3,gives:'milk'},
-  sugar_c: {emoji:'🍬',name:'설탕수수',growTime:15,cost:1500,yield:4,gives:'sugar'},
+  wheat:   {emoji:'🌾',name:'밀',      growTime:20,cost:500,yield:10,gives:'wheat'},
+  strawb:  {emoji:'🍓',name:'딸기',    growTime:30,cost:1000,yield:8,gives:'strawb'},
+  peach:   {emoji:'🍑',name:'복숭아',  growTime:30,cost:1000,yield:8,gives:'peach'},
+  bean:    {emoji:'🫘',name:'커피콩',  growTime:40,cost:2500,yield:15,gives:'bean'},
+  milk_c:  {emoji:'🥛',name:'유제품',  growTime:25,cost:3000,yield:7,gives:'milk'},
+  sugar_c: {emoji:'🍬',name:'설탕수수',growTime:15,cost:1500,yield:15,gives:'sugar'},
 };
 
 const ITEMS = {
@@ -627,8 +663,8 @@ function tick() {
       G.money=Math.max(0,G.money-wages);
       addLog(`💸 직원 일급 -${wages}원`);
     }
-    // Season change (every 30 game-days)
-    if (G.seasonDay>30) { G.seasonDay=1; advanceSeason(); }
+    // Season change (every 10 game-days)
+    if (G.seasonDay>10) { G.seasonDay=1; advanceSeason(); }
     addLog(`📅 Day ${G.day} 시작! (${SEASONS[G.seasonIndex].name})`);
     saveToStorage();
     renderSeasonStrip();
@@ -729,12 +765,12 @@ function checkCafeEligibility() {
   const total=Object.values(G.inventory).reduce((a,b)=>a+b,0);
   const btn=document.getElementById('open-cafe-btn');
   const desc=document.getElementById('cafe-lock-desc');
-  if (total>=10) {
+  if (total>=20) {
     btn.style.display='block';
     desc.innerHTML='재료가 충분히 모였어요! 카페를 오픈할 수 있어요 🎉';
   } else {
     btn.style.display='none';
-    desc.innerHTML=`재료를 모으면 카페를 열 수 있어요<br><span style="color:var(--grass);font-size:11px;">현재 창고: ${total}/10개</span>`;
+    desc.innerHTML=`재료를 모으면 카페를 열 수 있어요<br><span style="color:var(--grass);font-size:11px;">현재 창고: ${total}/20개</span>`;
   }
 }
 
@@ -1361,20 +1397,67 @@ function renderReviews() {
     </div>`).join('');
 }
 
-// ── 모바일 탭 전환 (CSS class 토글만, 기존 JS 무관) ──
+// ── 모바일 탭 전환 ──
 function mobTab(t) {
   ['farm','cafe','manage'].forEach(function(n) {
     var col = document.getElementById('col-'+n);
     var btn = document.getElementById('mbt-'+n);
-    if (col) { col.classList.remove('tab-show'); }
-    if (btn) { btn.classList.remove('on'); }
+    if (col) col.classList.remove('tab-show');
+    if (btn) btn.classList.remove('on');
   });
   var c = document.getElementById('col-'+t);
   var b = document.getElementById('mbt-'+t);
-  if (c) { c.classList.add('tab-show'); }
-  if (b) { b.classList.add('on'); }
+  if (c) c.classList.add('tab-show');
+  if (b) b.classList.add('on');
   window.scrollTo(0, 0);
 }
+
+// ── 모바일 상단바 & 미니 주문 패널 (1초마다 setInterval로 독립 실행) ──
+setInterval(function() {
+  // 모바일 여부 확인
+  if (window.innerWidth > 768) return;
+
+  // 상단바 수치 동기화
+  var el;
+  el = document.getElementById('mob-topbar-brand');
+  if (el) el.textContent = (document.getElementById('brandIcon') ? document.getElementById('brandIcon').textContent : '🌱') + ' ' + (G.brandName || '');
+  el = document.getElementById('mob-money');
+  if (el) el.textContent = (G.money || 0).toLocaleString();
+  el = document.getElementById('mob-rep');
+  if (el) el.textContent = (G.reputation || 0).toLocaleString();
+  el = document.getElementById('mob-day');
+  if (el) el.textContent = G.day || 1;
+  el = document.getElementById('mob-topbar-time');
+  if (el) {
+    var sec = G.secondsPlayed || 0;
+    el.textContent = Math.floor(sec/60).toString().padStart(2,'0') + ':' + (sec%60).toString().padStart(2,'0');
+  }
+
+  // 미니 주문 패널
+  var panel = document.getElementById('mob-order-panel');
+  if (!panel) return;
+  if (!G.cafeOpen) { panel.classList.remove('mob-visible'); return; }
+  panel.classList.add('mob-visible');
+  var list = document.getElementById('mob-op-list');
+  if (!list) return;
+  if (!G.customers || G.customers.length === 0) {
+    list.innerHTML = '<div class="mob-op-empty">대기 손님 없음</div>';
+    return;
+  }
+  list.innerHTML = G.customers.map(function(c) {
+    var recipe = RECIPES[c.order] || {};
+    var pc = c.patience > 60 ? '#5A8A3C' : c.patience > 30 ? '#F4C430' : '#e74c3c';
+    return '<div class="mob-op-item">' +
+      '<span class="mob-op-avatar">' + c.emoji + '</span>' +
+      '<div class="mob-op-info">' +
+        '<div class="mob-op-name">' + c.name + '</div>' +
+        '<div class="mob-op-order">' + (recipe.emoji||'') + ' ' + (recipe.name||'') + '</div>' +
+        '<div class="mob-op-pat"><div class="mob-op-pat-fill" style="width:'+c.patience+'%;background:'+pc+'"></div></div>' +
+      '</div>' +
+      '<button onclick="serveCustomer('+c.id+',false,\'\')" style="background:#5A8A3C;color:white;border:none;border-radius:7px;padding:4px 9px;font-size:11px;cursor:pointer;">서빙</button>' +
+    '</div>';
+  }).join('');
+}, 1000);
 </script>
 </body>
 </html>
