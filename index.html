@@ -833,7 +833,7 @@ function openCafe() {
 //  STAGE UP
 // ══════════════════════════════════════════
 function checkStageUp() {
-  if (!G.cafeOpen||G.stage>=4) return;
+  if (!G.cafeOpen||G.stage>=9) return;
   const next=STAGE_DATA[G.stage+1];
   if (next&&G.reputation>=next.repReq) {
     G.stage++;
@@ -1401,7 +1401,7 @@ function updateProgressBar() {
   const next=STAGE_DATA[G.stage+1]?.repReq||prev;
   const pct=G.stage>=4?100:Math.min(100,((cur-prev)/(next-prev))*100);
   document.getElementById('progressFill').style.width=pct+'%';
-  document.getElementById('progressText').textContent=G.stage>=4?'🏆 최고 단계!':cur+' / '+next+' 명성';
+  document.getElementById('progressText').textContent=G.stage>=9?'🏆 최고 단계!':cur+' / '+next+' 명성';
 }
 function updateSatisfaction() {
   const sat=G.satisfaction,full=Math.floor(sat),half=sat%1>=0.5;
