@@ -95,13 +95,26 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
 .prog-bg{height:9px;background:rgba(107,66,38,0.13);border-radius:5px;overflow:hidden;}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--grass),var(--sun));border-radius:5px;transition:width 0.6s ease;}
 
-/* MENU */
-.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-.menu-card{background:rgba(200,149,108,0.1);border:1.5px solid rgba(200,149,108,0.22);border-radius:9px;padding:8px 6px;text-align:center;}
+/* INVENTORY — 인라인 칩 형태 */
+.inv-chip{display:flex;align-items:center;gap:3px;background:rgba(107,66,38,0.09);border-radius:20px;padding:3px 8px;font-size:12px;}
+.inv-chip-icon{font-size:14px;}
+.inv-chip-qty{font-weight:700;color:var(--espresso);}
+.inv-chip-qty.low{color:#c0392b;}
+
+/* MENU CARD — 레시피 통합형 */
+.menu-card{background:rgba(200,149,108,0.1);border:1.5px solid rgba(200,149,108,0.22);border-radius:10px;padding:9px 8px;text-align:center;cursor:default;transition:all 0.15s;}
 .menu-card.unlocked{border-color:rgba(212,160,23,0.4);}
+.menu-card.can-learn{border-color:var(--grass);cursor:pointer;background:rgba(90,138,60,0.07);}
+.menu-card.can-learn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(90,138,60,0.2);}
 .menu-card.locked{opacity:0.4;filter:grayscale(0.4);}
 .menu-card.seasonal{border-color:#5dade2;background:rgba(93,173,226,0.1);}
-.menu-icon{font-size:22px;}.menu-name{font-size:10px;font-weight:700;margin-top:2px;line-height:1.3;}.menu-price{font-size:10px;color:var(--grass);}.menu-lock{font-size:9px;color:var(--latte);margin-top:1px;}
+.menu-icon{font-size:22px;}
+.menu-name{font-size:11px;font-weight:700;margin-top:2px;line-height:1.3;}
+.menu-price{font-size:10px;color:var(--grass);}
+.menu-ingr{font-size:9px;color:var(--latte);margin-top:2px;line-height:1.4;}
+.menu-action{font-size:10px;margin-top:4px;}
+.menu-learn-btn{background:var(--grass);color:white;border:none;border-radius:6px;padding:3px 7px;font-size:10px;cursor:pointer;font-family:'Gowun Dodum',sans-serif;font-weight:600;}
+.menu-learn-btn:hover{filter:brightness(1.1);}
 
 /* CUSTOMERS */
 .cust-card{display:flex;align-items:center;gap:7px;border-radius:8px;padding:7px 9px;font-size:12px;margin-bottom:5px;background:rgba(107,66,38,0.07);}
@@ -195,78 +208,54 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
 
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(200,149,108,0.4);border-radius:3px}
 
-/* ─────────────────────────────────────
-   모바일 전용 추가 스타일 (768px 이하)
-   JS 변경 없음 — CSS만
-───────────────────────────────────── */
+/* ───────────────────────────────
+   모바일 반응형 (768px 이하)
+─────────────────────────────── */
 @media (max-width: 768px) {
 
-  /* ① 원래 헤더 숨기고 고정 상단바로 대체 */
-  header { display: none !important; }
+  /* 하단 탭바 공간 확보 */
+  #app { padding: 8px 8px 72px; gap: 6px; }
 
-  /* ② 고정 상단 미니바 */
-  #mob-topbar {
-    display: flex !important;
-    position: fixed; top: 0; left: 0; right: 0; z-index: 998;
-    background: rgba(255,248,240,0.97);
-    border-bottom: 2px solid rgba(200,149,108,0.22);
-    box-shadow: 0 2px 10px rgba(59,31,15,0.1);
-    padding: 7px 12px;
-    align-items: center; gap: 8px;
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  }
-  #mob-topbar-brand {
-    font-size: 13px; font-weight: 800; color: var(--espresso);
-    flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .mob-stat { font-size: 12px; font-weight: 600; color: var(--espresso); white-space: nowrap; }
-  #mob-topbar-time {
-    font-size: 12px; font-weight: 700; color: var(--soil);
-    background: rgba(107,66,38,0.1); padding: 2px 8px; border-radius: 8px;
-    white-space: nowrap;
-  }
+  /* 헤더 압축 */
+  header { padding: 8px 12px; gap: 8px; border-radius: 12px; }
+  .brand-name { font-size: 15px; }
+  .brand-sub, #season-badge { display: none; }
+  .stage-badge { font-size: 11px; padding: 3px 8px; }
+  .stats-bar { gap: 8px; }
+  .stat { font-size: 12px; }
+  #game-time { font-size: 11px; padding: 2px 7px; }
+  .header-btns { display: none; } /* 저장은 탭바에서 */
 
-  /* ③ 앱 여백: 상단바(44px) + 하단탭바(64px) */
-  #app { padding: 52px 8px 72px !important; gap: 6px; }
-
-  /* ④ 농장탭 손님 미니패널 */
-  #mob-order-panel {
-    display: none;
-    flex-direction: column; gap: 6px;
-    background: linear-gradient(135deg, var(--espresso), #5C3A1E);
-    border-radius: 12px; padding: 10px 12px;
-  }
-  #mob-order-panel.mob-visible { display: flex; }
-  .mob-op-title { font-size: 11px; color: rgba(255,248,240,0.65); font-weight: 700; }
-  .mob-op-item {
-    display: flex; align-items: center; gap: 8px;
-    background: rgba(255,255,255,0.08); border-radius: 8px;
-    padding: 6px 8px; color: var(--cream); font-size: 12px;
-  }
-  .mob-op-avatar { font-size: 18px; flex-shrink: 0; }
-  .mob-op-info { flex: 1; min-width: 0; }
-  .mob-op-name { font-weight: 600; font-size: 11px; }
-  .mob-op-order { font-size: 10px; color: rgba(255,248,240,0.6); }
-  .mob-op-pat { height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; margin-top: 3px; }
-  .mob-op-pat-fill { height: 100%; border-radius: 2px; }
-  .mob-op-empty { font-size: 12px; color: rgba(255,248,240,0.45); text-align: center; padding: 2px 0; }
-
-  /* ⑤ 기존 3열 → 단일 블록 */
+  /* 3열 그리드 해제 */
   #game-main { display: block; }
-  #col-farm, #col-cafe, #col-manage { display: none; flex-direction: column; gap: 8px; }
-  #col-farm.tab-show, #col-cafe.tab-show, #col-manage.tab-show { display: flex; }
 
-  /* ⑥ 터치 최적화 */
+  /* 각 열: 기본 숨김 */
+  #col-farm, #col-cafe, #col-manage {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* 활성 열만 표시 */
+  #col-farm.tab-show   { display: flex; }
+  #col-cafe.tab-show   { display: flex; }
+  #col-manage.tab-show { display: flex; }
+
+  /* 밭 크게 */
   .plot { font-size: 26px; }
   .plot-label { font-size: 10px; }
+
+  /* 인벤토리 3열 */
   .inv-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* 메뉴 4열 */
   .menu-grid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
   .menu-icon { font-size: 20px; }
   .menu-name { font-size: 9px; }
 
-  /* ⑦ 하단 탭바 */
+  /* 하단 탭바 */
   #mob-bar {
-    display: flex !important;
+    display: flex;
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
     background: rgba(255,248,240,0.98);
     border-top: 2px solid rgba(200,149,108,0.25);
@@ -277,7 +266,8 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
     padding: 6px 2px; border: none; border-radius: 10px;
     background: transparent; cursor: pointer;
-    -webkit-tap-highlight-color: transparent; transition: background 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.1s;
   }
   .mbt.on { background: rgba(107,66,38,0.1); }
   .mbt-i { font-size: 22px; line-height: 1; }
@@ -285,10 +275,14 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   .mbt.on .mbt-l { color: var(--espresso); }
 }
 
-/* 데스크탑: 모바일 요소 완전 숨김 */
+/* 데스크탑: 탭바 숨김, 모든 열 표시 */
 @media (min-width: 769px) {
-  #mob-bar, #mob-topbar, #mob-order-panel { display: none !important; }
-  #col-farm, #col-cafe, #col-manage { display: flex !important; flex-direction: column; gap: 8px; }
+  #mob-bar { display: none; }
+  #col-farm, #col-cafe, #col-manage {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 </style>
 </head>
@@ -297,7 +291,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
 <!-- MODALS -->
 <div class="modal-overlay" id="nameModal">
   <div class="modal">
-    <div class="modal-title">🌱 카페 오픈</div>
+    <div class="modal-title">🌱 나만의 카페 시작하기</div>
     <div class="modal-body">
       <p style="text-align:center;color:var(--latte);font-size:13px;margin-bottom:14px;">농장을 키우고, 재료를 모아<br>나만의 카페를 열어보세요!</p>
       <input class="input-field" id="brandInput" placeholder="브랜드 이름 (예: 햇살농장 카페)" maxlength="20">
@@ -330,17 +324,6 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   </div>
 </div>
 
-<!-- 모바일 고정 상단바 (데스크탑에선 CSS로 숨김) -->
-<div id="mob-topbar">
-  <div id="mob-topbar-brand">🌱 내 농장</div>
-  <div style="display:flex;gap:8px;align-items:center;">
-    <span class="mob-stat">💰<span id="mob-money">0</span></span>
-    <span class="mob-stat">⭐<span id="mob-rep">0</span></span>
-    <span class="mob-stat">Day <span id="mob-day">1</span></span>
-  </div>
-  <div id="mob-topbar-time">00:00</div>
-</div>
-
 <!-- APP -->
 <div id="app">
   <header>
@@ -351,7 +334,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
     <div id="season-badge">🌸 봄</div>
     <div class="stage-badge" id="stageBadge">🌱 농장 단계</div>
     <div class="stats-bar">
-      <div class="stat">💰 <span id="moneyDisplay">100000</span>원</div>
+      <div class="stat">💰 <span id="moneyDisplay">500000</span>원</div>
       <div class="stat">⭐ <span id="repDisplay">0</span></div>
       <div class="stat">📅 Day <span id="dayDisplay">1</span></div>
       <div id="game-time">00:00</div>
@@ -365,12 +348,6 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   <div id="game-main">
     <!-- LEFT -->
     <div id="col-farm" class="tab-show" style="display:flex;flex-direction:column;gap:8px;">
-
-      <!-- 모바일 전용: 카페 오픈 후 손님 주문 미니 패널 -->
-      <div id="mob-order-panel">
-        <div class="mob-op-title">☕ 대기 손님</div>
-        <div id="mob-op-list"><div class="mob-op-empty">손님 없음</div></div>
-      </div>
       <div class="panel">
         <div class="panel-title">🌾 농장</div>
         <div class="season-strip">
@@ -380,11 +357,9 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
           <span id="seasonDay" style="font-size:10px;white-space:nowrap;">Day 1/30</span>
         </div>
         <div id="farm-grid"></div>
-        <div style="font-size:11px;color:var(--latte);text-align:center;">빈 밭 클릭 → 씨앗 선택 <br> 🌟반짝이는 밭 클릭 → 즉시 수확!</div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">🎒 창고</div>
-        <div class="inv-grid" id="inventoryGrid"></div>
+        <!-- 인라인 창고 -->
+        <div id="inventoryInline" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px;"></div>
+        <div style="font-size:11px;color:var(--latte);text-align:center;">빈 밭 클릭 → 씨앗 선택 &nbsp;|&nbsp; 🌟반짝이는 밭 → 즉시 수확!</div>
       </div>
       <div class="panel">
         <div class="panel-title">📢 알림</div>
@@ -416,10 +391,12 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
               <div class="prog-label"><span>다음 단계까지</span><span id="progressText">0 / 100 명성</span></div>
               <div class="prog-bg"><div class="prog-fill" id="progressFill" style="width:0%"></div></div>
             </div>
+            <!-- 메뉴판 (레시피 통합) -->
             <div>
               <div class="panel-title" style="margin-bottom:7px;">📋 메뉴판</div>
               <div class="menu-grid" id="menuGrid"></div>
             </div>
+            <!-- 방문 손님 -->
             <div>
               <div class="panel-title" style="margin-bottom:6px;">👥 방문 손님 <span id="custCount" style="font-size:11px;color:var(--latte);font-weight:400;"></span></div>
               <div id="customerList"></div>
@@ -429,16 +406,14 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
       </div>
     </div>
 
-    <!-- RIGHT -->
+    <!-- RIGHT: 직원/업그레이드 탭 + 리뷰 -->
     <div id="col-manage" style="display:flex;flex-direction:column;gap:8px;">
       <div class="panel">
         <div class="tab-bar">
-          <button class="tab-btn active" onclick="switchTab('recipes')">📖 레시피</button>
-          <button class="tab-btn" onclick="switchTab('staff')">👥 직원</button>
+          <button class="tab-btn active" onclick="switchTab('staff')">👥 직원</button>
           <button class="tab-btn" onclick="switchTab('upgrades')">🔧 업그레이드</button>
         </div>
-        <div class="tab-pane active" id="tab-recipes"></div>
-        <div class="tab-pane" id="tab-staff"></div>
+        <div class="tab-pane active" id="tab-staff"></div>
         <div class="tab-pane" id="tab-upgrades"></div>
       </div>
       <div class="panel">
@@ -460,6 +435,9 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
     </button>
     <button class="mbt" id="mbt-manage" onclick="mobTab('manage')">
       <span class="mbt-i">📋</span><span class="mbt-l">관리</span>
+    </button>
+    <button class="mbt" id="mbt-pause" onclick="togglePause()">
+      <span class="mbt-i" id="mob-pause-icon">⏸</span><span class="mbt-l" id="mob-pause-label">일시정지</span>
     </button>
     <button class="mbt" id="mbt-save" onclick="openSaveModal()">
       <span class="mbt-i">💾</span><span class="mbt-l">저장</span>
@@ -485,10 +463,10 @@ const SEASONS = [
 const CROPS = {
   wheat:   {emoji:'🌾',name:'밀',      growTime:20,cost:500,yield:10,gives:'wheat'},
   strawb:  {emoji:'🍓',name:'딸기',    growTime:30,cost:1000,yield:8,gives:'strawb'},
-  peach:   {emoji:'🍑',name:'복숭아',  growTime:30,cost:1000,yield:8,gives:'peach'},
-  bean:    {emoji:'🫘',name:'커피콩',  growTime:40,cost:2500,yield:15,gives:'bean'},
+  peach:   {emoji:'🍑',name:'복숭아',  growTime:45,cost:1000,yield:8,gives:'peach'},
+  bean:    {emoji:'🫘',name:'커피콩',  growTime:50,cost:2500,yield:15,gives:'bean'},
   milk_c:  {emoji:'🥛',name:'유제품',  growTime:25,cost:3000,yield:7,gives:'milk'},
-  sugar_c: {emoji:'🍬',name:'설탕수수',growTime:15,cost:1500,yield:15,gives:'sugar'},
+  sugar_c: {emoji:'🍬',name:'설탕수수',growTime:15,cost:1500,yield:25,gives:'sugar'},
 };
 
 const ITEMS = {
@@ -525,11 +503,11 @@ const UPGRADES = {
 // STAFF definitions
 // role: 'farmer'=자동 씨앗 심기+수확, 'barista'=자동 서빙, 'manager'=재료 부족시 자동 보충
 const STAFF_DEFS = {
-  parttime: {name:'아르바이트생', emoji:'👧',role:'barista',  desc:'손님 1명 자동 서빙 (30초마다)',   hireCost:30000, dailyCost:5000,  stageReq:1},
-  farmer_w: {name:'농장 일꾼',   emoji:'👨‍🌾',role:'farmer',   desc:'빈 밭에 자동으로 씨앗 심고 수확', hireCost:40000, dailyCost:6000,  stageReq:0},
-  barista:  {name:'바리스타',    emoji:'👨‍🍳',role:'barista',  desc:'손님 자동 서빙 (15초마다)',       hireCost:60000, dailyCost:10000, stageReq:2},
-  manager:  {name:'재료 관리자', emoji:'🧑‍💼',role:'manager',  desc:'부족한 재료 자동 파악 & 씨앗 심기',hireCost:70000, dailyCost:12000, stageReq:2},
-  head_chef:{name:'수석 셰프',   emoji:'👨‍🍳',role:'barista',  desc:'메뉴 판매가 +10% & 자동 서빙',   hireCost:120000,dailyCost:20000, stageReq:3},
+  parttime: {name:'아르바이트생', emoji:'👧',role:'barista',  desc:'손님 1명 자동 서빙 (310마다)',   hireCost:15000, dailyCost:5000,  stageReq:1},
+  farmer_w: {name:'농장 일꾼',   emoji:'👨‍🌾',role:'farmer',   desc:'빈 밭에 자동으로 씨앗 심고 수확', hireCost:20000, dailyCost:6000,  stageReq:0},
+  barista:  {name:'바리스타',    emoji:'👨‍🍳',role:'barista',  desc:'손님 자동 서빙 (10초마다)',       hireCost:30000, dailyCost:10000, stageReq:2},
+  manager:  {name:'재료 관리자', emoji:'🧑‍💼',role:'manager',  desc:'부족한 재료 자동 파악 & 씨앗 심기',hireCost:50000, dailyCost:12000, stageReq:2},
+  head_chef:{name:'수석 셰프',   emoji:'👨‍🍳',role:'barista',  desc:'메뉴 판매가 +10% & 자동 서빙',   hireCost:70000,dailyCost:20000, stageReq:3},
 };
 
 const STAGE_DATA = [
@@ -663,8 +641,8 @@ function tick() {
       G.money=Math.max(0,G.money-wages);
       addLog(`💸 직원 일급 -${wages}원`);
     }
-    // Season change (every 10 game-days)
-    if (G.seasonDay>10) { G.seasonDay=1; advanceSeason(); }
+    // Season change (every 30 game-days)
+    if (G.seasonDay>30) { G.seasonDay=1; advanceSeason(); }
     addLog(`📅 Day ${G.day} 시작! (${SEASONS[G.seasonIndex].name})`);
     saveToStorage();
     renderSeasonStrip();
@@ -1122,7 +1100,7 @@ function learnRecipe(key) {
   if (G.money<r.learnCost) { showNotif('💰 돈이 부족해요!'); return; }
   G.money-=r.learnCost; G.learnedRecipes.push(key);
   addLog(`📖 ${r.emoji} ${r.name} 레시피 습득!`);
-  renderTab('recipes'); renderMenu(); updateHeader();
+  renderMenu(); updateHeader();
 }
 
 function buyUpgrade(key) {
@@ -1211,8 +1189,22 @@ function openSaveModal() {
 function togglePause() {
   G.paused=!G.paused;
   document.getElementById('pauseLabel').textContent=G.paused?'재개':'일시정지';
+  // 모바일 버튼 동기화
+  var mi=document.getElementById('mob-pause-icon');
+  var ml=document.getElementById('mob-pause-label');
+  if (mi) mi.textContent=G.paused?'▶':'⏸';
+  if (ml) ml.textContent=G.paused?'재개':'일시정지';
   showNotif(G.paused?'⏸ 일시정지':'▶ 재개');
 }
+
+// 브라우저 백그라운드 → 자동 일시정지
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) {
+    if (!G.paused) { G.paused=true; G._autoPaused=true; }
+  } else {
+    if (G.paused && G._autoPaused) { G.paused=false; G._autoPaused=false; }
+  }
+});
 
 const LOGS=[];
 function addLog(msg) {
@@ -1233,12 +1225,12 @@ function updateTimeDisplay() {
   document.getElementById('game-time').textContent=`${m}:${s}`;
 }
 
-// TABS
-let currentTab='recipes';
+// TABS — 직원/업그레이드만
+let currentTab='staff';
 function switchTab(tab) {
   currentTab=tab;
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    const tabs=['recipes','staff','upgrades'];
+    const tabs=['staff','upgrades'];
     b.classList.toggle('active',tabs[i]===tab);
   });
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
@@ -1246,8 +1238,7 @@ function switchTab(tab) {
   renderTab(tab);
 }
 function renderTab(tab) {
-  if (tab==='recipes') renderRecipes();
-  else if (tab==='staff') renderStaff();
+  if (tab==='staff') renderStaff();
   else if (tab==='upgrades') renderUpgrades();
 }
 
@@ -1283,9 +1274,12 @@ function renderFarm() {
 }
 
 function renderInventory() {
-  document.getElementById('inventoryGrid').innerHTML=Object.entries(ITEMS).map(([k,item])=>{
-    const qty=G.inventory[k]||0;
-    return `<div class="inv-item"><span class="inv-icon">${item.emoji}</span><span class="inv-name">${item.name}</span><span class="inv-qty ${qty===0?'low':''}">${qty}</span></div>`;
+  // 인라인 칩 형태로 농장 패널 안에 표시
+  const el = document.getElementById('inventoryInline');
+  if (!el) return;
+  el.innerHTML = Object.entries(ITEMS).map(([k,item]) => {
+    const qty = G.inventory[k]||0;
+    return `<div class="inv-chip"><span class="inv-chip-icon">${item.emoji}</span><span class="inv-chip-qty ${qty===0?'low':''}">${qty}</span></div>`;
   }).join('');
 }
 
@@ -1311,16 +1305,27 @@ function renderMenu() {
   const seasonId=SEASONS[G.seasonIndex].id;
   document.getElementById('menuGrid').innerHTML=Object.entries(RECIPES).map(([k,r])=>{
     const isSeasonal=r.season!==null;
-    const wrongSeason=isSeasonal && r.season!==seasonId;
-    const unlocked=G.learnedRecipes.includes(k)&&r.stageReq<=G.stage&&!wrongSeason;
-    const locked=r.stageReq>G.stage||wrongSeason;
-    const seasonTag=isSeasonal?`<div class="menu-lock" style="color:#2471a3;font-size:9px;">${SEASONS.find(s=>s.id===r.season)?.emoji} 한정</div>`:'';
-    return `<div class="menu-card ${unlocked?'unlocked':locked?'locked':''} ${isSeasonal&&!wrongSeason?'seasonal':''}">
+    const wrongSeason=isSeasonal&&r.season!==seasonId;
+    const learned=G.learnedRecipes.includes(k);
+    const stageLocked=r.stageReq>G.stage||wrongSeason;
+    const canLearn=!learned&&!stageLocked&&G.money>=r.learnCost;
+    const ingr=Object.entries(r.ingredients).map(([i,q])=>`${ITEMS[i]?.emoji||'?'}×${q}`).join(' ');
+    let cardClass='menu-card';
+    if (learned&&!stageLocked) cardClass+=' unlocked';
+    else if (canLearn) cardClass+=' can-learn';
+    else if (stageLocked) cardClass+=' locked';
+    if (isSeasonal&&!wrongSeason) cardClass+=' seasonal';
+    const seasonTag=isSeasonal?`<div style="font-size:9px;color:#2471a3;">${SEASONS.find(s=>s.id===r.season)?.emoji} 한정</div>`:'';
+    let action='';
+    if (learned) action=`<div class="menu-action" style="color:var(--grass);font-size:10px;">✓ 보유</div>`;
+    else if (stageLocked) action=`<div class="menu-action" style="color:var(--latte);">${wrongSeason?'비수기':'🔒 Lv.'+r.stageReq}</div>`;
+    else action=`<div class="menu-action"><button class="menu-learn-btn" onclick="learnRecipe('${k}')">습득 💰${r.learnCost}</button></div>`;
+    return `<div class="${cardClass}">
       <div class="menu-icon">${r.emoji}</div>
       <div class="menu-name">${r.name}</div>
-      <div class="menu-price">${unlocked?'💰'+r.price+'원':''}</div>
-      <div class="menu-lock">${locked?(wrongSeason?'비수기':'🔒 잠금'):(!G.learnedRecipes.includes(k)?'미습득':'')}</div>
-      ${seasonTag}
+      <div class="menu-price">${learned&&!stageLocked?'💰'+r.price+'원':''}</div>
+      <div class="menu-ingr">${ingr}</div>
+      ${seasonTag}${action}
     </div>`;
   }).join('');
 }
@@ -1397,67 +1402,20 @@ function renderReviews() {
     </div>`).join('');
 }
 
-// ── 모바일 탭 전환 ──
+// ── 모바일 탭 전환 (CSS class 토글만, 기존 JS 무관) ──
 function mobTab(t) {
   ['farm','cafe','manage'].forEach(function(n) {
     var col = document.getElementById('col-'+n);
     var btn = document.getElementById('mbt-'+n);
-    if (col) col.classList.remove('tab-show');
-    if (btn) btn.classList.remove('on');
+    if (col) { col.classList.remove('tab-show'); }
+    if (btn) { btn.classList.remove('on'); }
   });
   var c = document.getElementById('col-'+t);
   var b = document.getElementById('mbt-'+t);
-  if (c) c.classList.add('tab-show');
-  if (b) b.classList.add('on');
+  if (c) { c.classList.add('tab-show'); }
+  if (b) { b.classList.add('on'); }
   window.scrollTo(0, 0);
 }
-
-// ── 모바일 상단바 & 미니 주문 패널 (1초마다 setInterval로 독립 실행) ──
-setInterval(function() {
-  // 모바일 여부 확인
-  if (window.innerWidth > 768) return;
-
-  // 상단바 수치 동기화
-  var el;
-  el = document.getElementById('mob-topbar-brand');
-  if (el) el.textContent = (document.getElementById('brandIcon') ? document.getElementById('brandIcon').textContent : '🌱') + ' ' + (G.brandName || '');
-  el = document.getElementById('mob-money');
-  if (el) el.textContent = (G.money || 0).toLocaleString();
-  el = document.getElementById('mob-rep');
-  if (el) el.textContent = (G.reputation || 0).toLocaleString();
-  el = document.getElementById('mob-day');
-  if (el) el.textContent = G.day || 1;
-  el = document.getElementById('mob-topbar-time');
-  if (el) {
-    var sec = G.secondsPlayed || 0;
-    el.textContent = Math.floor(sec/60).toString().padStart(2,'0') + ':' + (sec%60).toString().padStart(2,'0');
-  }
-
-  // 미니 주문 패널
-  var panel = document.getElementById('mob-order-panel');
-  if (!panel) return;
-  if (!G.cafeOpen) { panel.classList.remove('mob-visible'); return; }
-  panel.classList.add('mob-visible');
-  var list = document.getElementById('mob-op-list');
-  if (!list) return;
-  if (!G.customers || G.customers.length === 0) {
-    list.innerHTML = '<div class="mob-op-empty">대기 손님 없음</div>';
-    return;
-  }
-  list.innerHTML = G.customers.map(function(c) {
-    var recipe = RECIPES[c.order] || {};
-    var pc = c.patience > 60 ? '#5A8A3C' : c.patience > 30 ? '#F4C430' : '#e74c3c';
-    return '<div class="mob-op-item">' +
-      '<span class="mob-op-avatar">' + c.emoji + '</span>' +
-      '<div class="mob-op-info">' +
-        '<div class="mob-op-name">' + c.name + '</div>' +
-        '<div class="mob-op-order">' + (recipe.emoji||'') + ' ' + (recipe.name||'') + '</div>' +
-        '<div class="mob-op-pat"><div class="mob-op-pat-fill" style="width:'+c.patience+'%;background:'+pc+'"></div></div>' +
-      '</div>' +
-      '<button onclick="serveCustomer('+c.id+',false,\'\')" style="background:#5A8A3C;color:white;border:none;border-radius:7px;padding:4px 9px;font-size:11px;cursor:pointer;">서빙</button>' +
-    '</div>';
-  }).join('');
-}, 1000);
 </script>
 </body>
 </html>
