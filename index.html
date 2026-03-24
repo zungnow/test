@@ -470,8 +470,7 @@ const CROPS = {
   sugar_c:  {emoji:'🍬',name:'설탕수수',growTime:15, cost:1500, yield:25, gives:'sugar'},
   // 2단계 이후
   egg_c:    {emoji:'🥚',name:'달걀',    growTime:20, cost:800,  yield:12, gives:'egg'},
-  flour_c:  {emoji:'🌽',name:'밀가루',  growTime:18, cost:600,  yield:15, gives:'flour'},
-  // 4단계 이후
+   // 4단계 이후
   potato_c: {emoji:'🥔',name:'감자',    growTime:35, cost:1200, yield:10, gives:'potato'},
   tomato_c: {emoji:'🍅',name:'토마토',  growTime:40, cost:1500, yield:8,  gives:'tomato'},
   mushroom_c:{emoji:'🍄',name:'버섯',   growTime:50, cost:2000, yield:6,  gives:'mushroom'},
@@ -487,45 +486,44 @@ const ITEMS = {
   wheat:   {name:'밀',    emoji:'🌾'}, strawb:  {name:'딸기',   emoji:'🍓'},
   peach:   {name:'복숭아',emoji:'🍑'}, bean:    {name:'커피콩', emoji:'🫘'},
   milk:    {name:'우유',  emoji:'🥛'}, sugar:   {name:'설탕',   emoji:'🍬'},
-  egg:     {name:'달걀',  emoji:'🥚'}, flour:   {name:'밀가루', emoji:'🌽'},
-  potato:  {name:'감자',  emoji:'🥔'}, tomato:  {name:'토마토', emoji:'🍅'},
-  mushroom:{name:'버섯',  emoji:'🍄'}, meat:    {name:'고기',   emoji:'🥩'},
-  basil:   {name:'허브',  emoji:'🌿'}, truffle: {name:'트러플', emoji:'⚫'},
-  cream:   {name:'생크림',emoji:'🍶'},
+  egg:     {name:'달걀',  emoji:'🥚'}, potato:  {name:'감자',  emoji:'🥔'}, 
+tomato:  {name:'토마토', emoji:'🍅'}, mushroom:{name:'버섯',  emoji:'🍄'}, 
+meat:    {name:'고기',   emoji:'🥩'}, basil:   {name:'허브',  emoji:'🌿'}, 
+truffle: {name:'트러플', emoji:'⚫'}, cream:   {name:'생크림',emoji:'🍶'},
 };
 
 // stageReq: 0=농장, 1=노점, 2=토스트점, 3=분식점, 4=카페, 5=디저트카페, 6=비스트로, 7=레스토랑, 8=파인다이닝, 9=프랜차이즈
 const RECIPES = {
   // ── 1단계: 노점 ──
-  egg_toast:    {emoji:'🍳',name:'계란 토스트',   price:2000, stageReq:1, ingredients:{flour:1,egg:1},              learnCost:0,    season:null,     reviews:['든든해요!','아침에 딱!','따뜻하고 맛있어요~']},
-  hotteok:      {emoji:'🥞',name:'호떡',          price:2500, stageReq:1, ingredients:{flour:1,sugar:1},            learnCost:500,  season:null,     reviews:['달콤해요!','길거리 감성~','바삭하고 맛있어요!']},
+  egg_toast:    {emoji:'🍳',name:'계란 토스트',   price:2000, stageReq:1, ingredients:{wheat:1,egg:1},              learnCost:0,    season:null,     reviews:['든든해요!','아침에 딱!','따뜻하고 맛있어요~']},
+  hotteok:      {emoji:'🥞',name:'호떡',          price:2500, stageReq:1, ingredients:{wheat:1,sugar:1},            learnCost:500,  season:null,     reviews:['달콤해요!','길거리 감성~','바삭하고 맛있어요!']},
   // ── 2단계: 토스트점 ──
-  ham_toast:    {emoji:'🥪',name:'햄치즈 토스트', price:3500, stageReq:2, ingredients:{flour:1,egg:1,milk:1},       learnCost:1000, season:null,     reviews:['치즈가 쭉쭉~','든든해요!','점심으로 딱!']},
-  strawb_toast: {emoji:'🍓',name:'딸기잼 토스트', price:3000, stageReq:2, ingredients:{flour:1,strawb:1,sugar:1},   learnCost:800,  season:null,     reviews:['달콤해요!','향기가 좋아요~','아이들이 좋아해요!']},
-  plain_cookie: {emoji:'🍪',name:'플레인 쿠키',   price:2500, stageReq:2, ingredients:{flour:1,sugar:1,egg:1},      learnCost:500,  season:null,     reviews:['바삭해요!','고소한 냄새~','커피랑 잘 어울려요!']},
+  ham_toast:    {emoji:'🥪',name:'햄치즈 토스트', price:3500, stageReq:2, ingredients:{wheat:1,egg:1,milk:1},       learnCost:1000, season:null,     reviews:['치즈가 쭉쭉~','든든해요!','점심으로 딱!']},
+  strawb_toast: {emoji:'🍓',name:'딸기잼 토스트', price:3000, stageReq:2, ingredients:{wheat:1,strawb:1,sugar:1},   learnCost:800,  season:null,     reviews:['달콤해요!','향기가 좋아요~','아이들이 좋아해요!']},
+  plain_cookie: {emoji:'🍪',name:'플레인 쿠키',   price:2500, stageReq:2, ingredients:{wheat:1,sugar:1,egg:1},      learnCost:500,  season:null,     reviews:['바삭해요!','고소한 냄새~','커피랑 잘 어울려요!']},
   // ── 3단계: 분식점 ──
-  tteokbokki:   {emoji:'🌶️',name:'떡볶이',       price:4000, stageReq:3, ingredients:{flour:2,tomato:1,sugar:1},   learnCost:2000, season:null,     reviews:['매콤달콤!','중독적이에요~','또 먹고 싶어요!']},
+  tteokbokki:   {emoji:'🌶️',name:'떡볶이',       price:4000, stageReq:3, ingredients:{wheat:2,tomato:1,sugar:1},   learnCost:2000, season:null,     reviews:['매콤달콤!','중독적이에요~','또 먹고 싶어요!']},
   kimbap:       {emoji:'🍙',name:'김밥',          price:4500, stageReq:3, ingredients:{wheat:1,egg:1,mushroom:1},   learnCost:2000, season:null,     reviews:['꽉 찬 속재료!','소풍 필수템~','집밥 느낌!']},
-  sundae:       {emoji:'🌭',name:'순대',           price:3500, stageReq:3, ingredients:{meat:1,flour:1},             learnCost:1500, season:null,     reviews:['쫄깃해요!','분식집 느낌~','고소해요!']},
+  sundae:       {emoji:'🌭',name:'순대',           price:3500, stageReq:3, ingredients:{meat:1,wheat:1},             learnCost:1500, season:null,     reviews:['쫄깃해요!','분식집 느낌~','고소해요!']},
   // ── 4단계: 카페 ──
   latte:        {emoji:'☕',name:'라떼',           price:5500, stageReq:4, ingredients:{bean:1,milk:1},              learnCost:3000, season:null,     reviews:['부드러운 라떼!','커피 향이 진해요!','진짜 카페 느낌~']},
   americano:    {emoji:'🖤',name:'아메리카노',     price:4500, stageReq:4, ingredients:{bean:2},                     learnCost:2000, season:null,     reviews:['진한 커피!','쌉싸름해요~','깔끔해요!']},
   strawb_latte: {emoji:'🍓',name:'딸기 라떼',     price:6500, stageReq:4, ingredients:{bean:1,strawb:1,milk:1},     learnCost:3000, season:null,     reviews:['이 메뉴 최고!','인스타에 올렸어요!','또 주문했어요!']},
   peach_tea:    {emoji:'🫖',name:'복숭아 티',      price:5000, stageReq:4, ingredients:{peach:1,sugar:1},            learnCost:2500, season:null,     reviews:['복숭아향 진해요!','향기 너무 좋아요~','힐링돼요!']},
   // ── 5단계: 디저트 카페 ──
-  strawb_cake:  {emoji:'🍰',name:'딸기 케이크',   price:8000, stageReq:5, ingredients:{flour:1,strawb:2,cream:1},   learnCost:5000, season:null,     reviews:['예쁘고 맛있어요!','선물용으로 딱!','달콤해요~']},
-  macaron:      {emoji:'🧁',name:'마카롱',         price:6000, stageReq:5, ingredients:{flour:1,egg:1,sugar:2,cream:1},learnCost:4000,season:null,   reviews:['너무 예뻐요!','달달해요~','선물하기 좋아요!']},
-  waffle:       {emoji:'🧇',name:'와플',           price:7000, stageReq:5, ingredients:{flour:2,egg:1,milk:1},       learnCost:4000, season:null,     reviews:['바삭바삭!','시럽이랑 최고~','브런치 느낌!']},
+  strawb_cake:  {emoji:'🍰',name:'딸기 케이크',   price:8000, stageReq:5, ingredients:{wheat:1,strawb:2,cream:1},   learnCost:5000, season:null,     reviews:['예쁘고 맛있어요!','선물용으로 딱!','달콤해요~']},
+  macaron:      {emoji:'🧁',name:'마카롱',         price:6000, stageReq:5, ingredients:{wheat:1,egg:1,sugar:2,cream:1},learnCost:4000,season:null,   reviews:['너무 예뻐요!','달달해요~','선물하기 좋아요!']},
+  waffle:       {emoji:'🧇',name:'와플',           price:7000, stageReq:5, ingredients:{wheat:2,egg:1,milk:1},       learnCost:4000, season:null,     reviews:['바삭바삭!','시럽이랑 최고~','브런치 느낌!']},
   peach_smoothie:{emoji:'🥤',name:'복숭아 스무디',price:6500, stageReq:5, ingredients:{peach:2,milk:1,sugar:1},     learnCost:3500, season:null,     reviews:['시원해요!','복숭아가 진해요~','여름에 딱!']},
   // ── 6단계: 비스트로 ──
   potato_soup:  {emoji:'🥣',name:'감자 수프',      price:9000, stageReq:6, ingredients:{potato:2,milk:1,basil:1},   learnCost:6000, season:null,     reviews:['따뜻하고 맛있어요!','크리미해요~','속이 편해요!']},
-  tomato_pasta: {emoji:'🍝',name:'토마토 파스타',  price:12000,stageReq:6, ingredients:{flour:2,tomato:2,basil:1},  learnCost:8000, season:null,     reviews:['정통 이탈리안!','소스가 진해요~','또 먹고 싶어요!']},
+  tomato_pasta: {emoji:'🍝',name:'토마토 파스타',  price:12000,stageReq:6, ingredients:{wheat:2,tomato:2,basil:1},  learnCost:8000, season:null,     reviews:['정통 이탈리안!','소스가 진해요~','또 먹고 싶어요!']},
   mushroom_risotto:{emoji:'🍚',name:'버섯 리조또',price:13000,stageReq:6, ingredients:{wheat:1,mushroom:2,milk:1,basil:1},learnCost:8000,season:null,reviews:['고급스러워요!','버섯향이 진해요~','레스토랑 느낌!']},
   // ── 7단계: 레스토랑 ──
   steak:        {emoji:'🥩',name:'스테이크',       price:25000,stageReq:7, ingredients:{meat:2,basil:1,mushroom:1},  learnCost:15000,season:null,    reviews:['육즙이 살아있어요!','완벽한 굽기!','최고의 스테이크!']},
-  burger:       {emoji:'🍔',name:'프리미엄 버거',  price:15000,stageReq:7, ingredients:{flour:1,meat:1,tomato:1,egg:1},learnCost:10000,season:null,  reviews:['패티가 두툼해요!','소스가 맛있어요~','최고의 버거!']},
+  burger:       {emoji:'🍔',name:'프리미엄 버거',  price:15000,stageReq:7, ingredients:{wheat:1,meat:1,tomato:1,egg:1},learnCost:10000,season:null,  reviews:['패티가 두툼해요!','소스가 맛있어요~','최고의 버거!']},
   // ── 8단계: 파인다이닝 ──
-  truffle_pasta:{emoji:'🖤',name:'트러플 파스타',  price:45000,stageReq:8, ingredients:{flour:2,truffle:1,cream:1,basil:1},learnCost:30000,season:null,reviews:['환상적이에요!','이런 맛은 처음!','럭셔리해요~']},
+  truffle_pasta:{emoji:'🖤',name:'트러플 파스타',  price:45000,stageReq:8, ingredients:{wheat:2,truffle:1,cream:1,basil:1},learnCost:30000,season:null,reviews:['환상적이에요!','이런 맛은 처음!','럭셔리해요~']},
   prime_steak:  {emoji:'🥇',name:'프라임 스테이크',price:60000,stageReq:8, ingredients:{meat:3,truffle:1,basil:1},   learnCost:40000,season:null,    reviews:['인생 스테이크!','완벽 그 자체!','별 다섯개!']},
   // ── 9단계: 프랜차이즈 ──
   premium_course:{emoji:'🎂',name:'프리미엄 코스', price:90000,stageReq:9, ingredients:{meat:2,truffle:1,cream:2,mushroom:1,basil:1},learnCost:60000,season:null,reviews:['인생 최고의 식사!','모든 게 완벽해요!','또 오고 싶어요!']},
@@ -533,10 +531,10 @@ const RECIPES = {
   // ── 계절 한정 ──
   // 봄
   spring_blossom:{emoji:'🌸',name:'봄꽃 라떼',    price:7000, stageReq:4, ingredients:{bean:1,milk:1,sugar:1},      learnCost:3000, season:'spring', reviews:['봄 느낌 물씬~','또 먹고 싶어요!','사진 찍었어요!']},
-  spring_strawb_crepe:{emoji:'🥞',name:'딸기 크레페',price:8000,stageReq:5,ingredients:{flour:1,strawb:2,cream:1},  learnCost:5000, season:'spring', reviews:['봄 딸기 최고!','크레페가 부드러워요~','예쁘게 나왔어요!']},
+  spring_strawb_crepe:{emoji:'🥞',name:'딸기 크레페',price:8000,stageReq:5,ingredients:{wheat:1,strawb:2,cream:1},  learnCost:5000, season:'spring', reviews:['봄 딸기 최고!','크레페가 부드러워요~','예쁘게 나왔어요!']},
   // 여름
   summer_ice:   {emoji:'🧊',name:'썸머 아이스티',  price:7000, stageReq:4, ingredients:{peach:1,sugar:2},           learnCost:3000, season:'summer', reviews:['시원해요!','여름엔 이게 최고!','또 주문했어요!']},
-  summer_pasta: {emoji:'🍝',name:'냉파스타',        price:13000,stageReq:6, ingredients:{flour:2,tomato:2,basil:1},  learnCost:8000, season:'summer', reviews:['여름에 딱!','시원하고 맛있어요~','상큼해요!']},
+  summer_pasta: {emoji:'🍝',name:'냉파스타',        price:13000,stageReq:6, ingredients:{wheat:2,tomato:2,basil:1},  learnCost:8000, season:'summer', reviews:['여름에 딱!','시원하고 맛있어요~','상큼해요!']},
   // 가을
   autumn_latte: {emoji:'🍂',name:'가을 호박 라떼',  price:7000, stageReq:4, ingredients:{bean:1,milk:1,sugar:2},    learnCost:3000, season:'autumn', reviews:['가을 감성!','호박향이 은은해요~','따뜻해요!']},
   autumn_mushroom:{emoji:'🍄',name:'버섯 크림 수프',price:10000,stageReq:6, ingredients:{mushroom:2,cream:1,basil:1},learnCost:6000, season:'autumn', reviews:['가을 별미!','버섯향 진해요~','크리미해요!']},
@@ -613,7 +611,7 @@ let G = {
   paused:false, secondsPlayed:0, dayTimer:0,
   seasonIndex:0, seasonDay:1,
   plots:Array(8).fill(null).map(()=>({crop:null,plantedAt:null,growTime:null,stage:'empty'})),
-  inventory:{wheat:0,strawb:0,peach:0,bean:0,milk:0,sugar:0,egg:0,flour:0,potato:0,tomato:0,mushroom:0,meat:0,basil:0,truffle:0,cream:0},
+  inventory:{wheat:0,strawb:0,peach:0,bean:0,milk:0,sugar:0,egg:0,potato:0,tomato:0,mushroom:0,meat:0,basil:0,truffle:0,cream:0},
   learnedRecipes:['egg_toast'],
   upgrades:[],
   staff:{},      // {staffId: true}
