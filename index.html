@@ -335,7 +335,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
     <div id="season-badge">🌸 봄</div>
     <div class="stage-badge" id="stageBadge">🌱 농장 단계</div>
     <div class="stats-bar">
-      <div class="stat">💰 <span id="moneyDisplay">500000</span>원</div>
+      <div class="stat">💰 <span id="moneyDisplay">100000</span>원</div>
       <div class="stat">⭐ <span id="repDisplay">0</span></div>
       <div class="stat">📅 Day <span id="dayDisplay">1</span></div>
       <div id="game-time">00:00</div>
@@ -355,7 +355,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
           <span id="seasonEmoji">🌸</span>
           <span id="seasonName">봄</span>
           <div class="season-bar-bg"><div class="season-bar-fill" id="seasonBar" style="width:0%"></div></div>
-          <span id="seasonDay" style="font-size:10px;white-space:nowrap;">Day 1/30</span>
+          <span id="seasonDay" style="font-size:10px;white-space:nowrap;">Day 1/10</span>
         </div>
         <div id="farm-grid"></div>
         <!-- 인라인 창고 -->
@@ -705,7 +705,7 @@ function tick() {
       addLog(`💸 직원 일급 -${wages}원`);
     }
     // Season change (every 30 game-days)
-    if (G.seasonDay>30) { G.seasonDay=1; advanceSeason(); }
+    if (G.seasonDay>10) { G.seasonDay=1; advanceSeason(); }
     addLog(`📅 Day ${G.day} 시작! (${SEASONS[G.seasonIndex].name})`);
     saveToStorage();
     renderSeasonStrip();
@@ -1383,13 +1383,17 @@ function renderMenu() {
     if (learned) action=`<div class="menu-action" style="color:var(--grass);font-size:10px;">✓ 보유</div>`;
     else if (stageLocked) action=`<div class="menu-action" style="color:var(--latte);">${wrongSeason?'비수기':'🔒 Lv.'+r.stageReq}</div>`;
     else action=`<div class="menu-action"><button class="menu-learn-btn" onclick="learnRecipe('${k}')">습득 💰${r.learnCost}</button></div>`;
-    return `<div class="${cardClass}">
-      <div class="menu-icon">${r.emoji}</div>
-      <div class="menu-name">${r.name}</div>
-      <div class="menu-price">${learned&&!stageLocked?'💰'+r.price+'원':''}</div>
-      <div class="menu-ingr">${ingr}</div>
-      ${seasonTag}${action}
-    </div>`;
+    return `<div class="${cardClass}" ${!learned&&!stageLocked?`onclick="learnRecipe('${k}')"`:''}>
+  <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
+    <span style="font-size:15px;">${r.emoji}</span>
+    <span style="font-size:11px;font-weight:700;flex:1;text-align:left;">${r.name}</span>
+    ${learned&&!stageLocked?'<span style="font-size:10px;color:var(--grass);">✓</span>':stageLocked?`<span style="font-size:9px;color:var(--latte);">${wrongSeason?'비수기':'🔒'+r.stageReq}</span>`:''}
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:9px;">
+    <span style="color:var(--grass);">${learned&&!stageLocked?'💰'+r.price:!stageLocked?'습득 💰'+r.learnCost:''}</span>
+    <span style="color:var(--latte);">${ingr}</span>
+  </div>
+</div>`;
   }).join('');
 }
 
