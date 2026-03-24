@@ -708,7 +708,7 @@ function tick() {
       G.money=Math.max(0,G.money-wages);
       addLog(`💸 직원 일급 -${wages}원`);
     }
-    // Season change (every 30 game-days)
+    // Season change (every 10 game-days)
     if (G.seasonDay>10) { G.seasonDay=1; advanceSeason(); }
     addLog(`📅 Day ${G.day} 시작! (${SEASONS[G.seasonIndex].name})`);
     saveToStorage();
