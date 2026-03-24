@@ -931,7 +931,7 @@ function openPlantModal(idx) {
   const season=SEASONS[G.seasonIndex];
   document.getElementById('plantModalTitle').textContent=`🌱 밭 ${idx+1}번 — 씨앗 고르기`;
   document.getElementById('plantModalBody').innerHTML=`
-    <p style="font-size:11px;color:var(--latte);margin-bottom:8px;">${season.emoji} ${season.name} 추천 작물: ${season.dayCrops.map(k=>CROPS[k]?.emoji+CROPS[k]?.name).join(', ')}</p>
+    <p style="font-size:11px;color:var(--latte);margin-bottom:8px;">${season.emoji} ${season.name} 추천 작물: ${season.dayCrops.filter(k=>CROPS[k]).map(k=>CROPS[k].emoji+CROPS[k].name).join(', ')}</p>
     <div class="seed-picker" style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;">${Object.entries(CROPS).map(([k,c])=>{
       const isSeasonal=season.dayCrops.includes(k);
       return `<div class="seed-row" style="${isSeasonal?'border:1.5px solid rgba(93,173,226,0.5);background:rgba(93,173,226,0.07)':''}">
