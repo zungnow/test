@@ -248,10 +248,14 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   /* 인벤토리 3열 */
   .inv-grid { grid-template-columns: repeat(3, 1fr); }
 
-  /* 메뉴 4열 */
-  .menu-grid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  /* 메뉴 3열 */
+  .menu-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
   .menu-icon { font-size: 20px; }
   .menu-name { font-size: 9px; }
+  .menu-card { padding: 6px 4px; }
+  .menu-ingr { display: none; }        /* 재료 숨기기 */
+  .menu-learn-btn { font-size: 9px; padding: 2px 4px; }
+  .menu-action { margin-top: 2px; }
 
   /* 하단 탭바 */
   #mob-bar {
@@ -361,10 +365,6 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
         <div id="inventoryInline" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px;"></div>
         <div style="font-size:11px;color:var(--latte);text-align:center;">빈 밭 클릭 → 씨앗 선택 &nbsp;|&nbsp; 🌟반짝이는 밭 → 즉시 수확!</div>
       </div>
-      <div class="panel">
-        <div class="panel-title">📢 알림</div>
-        <div id="logEntries" style="display:flex;flex-direction:column;gap:3px;"></div>
-      </div>
     </div>
 
     <!-- CENTER -->
@@ -395,6 +395,11 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
             <div>
               <div class="panel-title" style="margin-bottom:6px;">👥 방문 손님 <span id="custCount" style="font-size:11px;color:var(--latte);font-weight:400;"></span></div>
               <div id="customerList"></div>
+<div>
+      <div class="panel">
+        <div class="panel-title">📢 알림</div>
+        <div id="logEntries" style="display:flex;flex-direction:column;gap:3px;"></div>
+      </div>
             <!-- 메뉴판 (레시피 통합) -->
             <div>
               <div class="panel-title" style="margin-bottom:7px;">📋 메뉴판</div>
@@ -503,7 +508,7 @@ const UPGRADES = {
 // STAFF definitions
 // role: 'farmer'=자동 씨앗 심기+수확, 'barista'=자동 서빙, 'manager'=재료 부족시 자동 보충
 const STAFF_DEFS = {
-  parttime: {name:'아르바이트생', emoji:'👧',role:'barista',  desc:'손님 1명 자동 서빙 (310마다)',   hireCost:15000, dailyCost:5000,  stageReq:1},
+  parttime: {name:'아르바이트생', emoji:'👧',role:'barista',  desc:'손님 1명 자동 서빙 (10마다)',   hireCost:15000, dailyCost:5000,  stageReq:1},
   farmer_w: {name:'농장 일꾼',   emoji:'👨‍🌾',role:'farmer',   desc:'빈 밭에 자동으로 씨앗 심고 수확', hireCost:20000, dailyCost:6000,  stageReq:0},
   barista:  {name:'바리스타',    emoji:'👨‍🍳',role:'barista',  desc:'손님 자동 서빙 (10초마다)',       hireCost:30000, dailyCost:10000, stageReq:2},
   manager:  {name:'재료 관리자', emoji:'🧑‍💼',role:'manager',  desc:'부족한 재료 자동 파악 & 씨앗 심기',hireCost:50000, dailyCost:12000, stageReq:2},
@@ -641,8 +646,8 @@ function tick() {
       G.money=Math.max(0,G.money-wages);
       addLog(`💸 직원 일급 -${wages}원`);
     }
-    // Season change (every 30 game-days)
-    if (G.seasonDay>30) { G.seasonDay=1; advanceSeason(); }
+    // Season change (every 10 game-days)
+    if (G.seasonDay>10) { G.seasonDay=1; advanceSeason(); }
     addLog(`📅 Day ${G.day} 시작! (${SEASONS[G.seasonIndex].name})`);
     saveToStorage();
     renderSeasonStrip();
