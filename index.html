@@ -217,7 +217,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   #app { padding: 8px 8px 72px; gap: 6px; }
 
   /* 헤더 압축 */
-  header { padding: 8px 12px; gap: 8px; border-radius: 12px; position: sticky; top: 0; z-index: 90;}
+  header { padding: 8px 12px; gap: 8px; border-radius: 12px; }
   .brand-name { font-size: 15px; }
   .brand-sub, #season-badge { display: none; }
   .stage-badge { font-size: 11px; padding: 3px 8px; }
@@ -248,14 +248,10 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   /* 인벤토리 3열 */
   .inv-grid { grid-template-columns: repeat(3, 1fr); }
 
-  /* 메뉴 3열 */
-  .menu-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  /* 메뉴 4열 */
+  .menu-grid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
   .menu-icon { font-size: 20px; }
   .menu-name { font-size: 9px; }
-  .menu-card { padding: 6px 4px; }
-  .menu-ingr { display: none; }        /* 재료 숨기기 */
-  .menu-learn-btn { font-size: 9px; padding: 2px 4px; }
-  .menu-action { margin-top: 2px; }
 
   /* 하단 탭바 */
   #mob-bar {
@@ -365,6 +361,10 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
         <div id="inventoryInline" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px;"></div>
         <div style="font-size:11px;color:var(--latte);text-align:center;">빈 밭 클릭 → 씨앗 선택 &nbsp;|&nbsp; 🌟반짝이는 밭 → 즉시 수확!</div>
       </div>
+      <div class="panel">
+        <div class="panel-title">📢 알림</div>
+        <div id="logEntries" style="display:flex;flex-direction:column;gap:3px;"></div>
+      </div>
     </div>
 
     <!-- CENTER -->
@@ -395,11 +395,6 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
             <div>
               <div class="panel-title" style="margin-bottom:6px;">👥 방문 손님 <span id="custCount" style="font-size:11px;color:var(--latte);font-weight:400;"></span></div>
               <div id="customerList"></div>
-<div>
-      <div class="panel">
-        <div class="panel-title">📢 알림</div>
-        <div id="logEntries" style="display:flex;flex-direction:column;gap:3px;"></div>
-      </div>
             <!-- 메뉴판 (레시피 통합) -->
             <div>
               <div class="panel-title" style="margin-bottom:7px;">📋 메뉴판</div>
@@ -459,68 +454,128 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
 // ══════════════════════════════════════════
 
 const SEASONS = [
-  { id:'spring', name:'봄',   emoji:'🌸', bg:'linear-gradient(160deg,#fce4ec 0%,#e8f5e9 60%,#c8e6c9 100%)', barColor:'#f48fb1', dayCrops:['wheat','strawb','milk_c','sugar_c'] },
-  { id:'summer', name:'여름', emoji:'🌞', bg:'linear-gradient(160deg,#fffde7 0%,#e0f7fa 60%,#b2ebf2 100%)', barColor:'#ffb300', dayCrops:['peach','bean','milk_c','sugar_c'] },
-  { id:'autumn', name:'가을', emoji:'🍂', bg:'linear-gradient(160deg,#fff3e0 0%,#ffe0b2 60%,#ffcc80 100%)', barColor:'#e65100', dayCrops:['wheat','strawb','peach','sugar_c'] },
-  { id:'winter', name:'겨울', emoji:'❄️', bg:'linear-gradient(160deg,#e3f2fd 0%,#e8eaf6 60%,#c5cae9 100%)', barColor:'#5c6bc0', dayCrops:['bean','milk_c','wheat'] },
+  { id:'spring', name:'봄',   emoji:'🌸', bg:'linear-gradient(160deg,#fce4ec 0%,#e8f5e9 60%,#c8e6c9 100%)', barColor:'#f48fb1', dayCrops:['wheat','strawb','milk_c','sugar_c','egg_c','flour_c'] },
+  { id:'summer', name:'여름', emoji:'🌞', bg:'linear-gradient(160deg,#fffde7 0%,#e0f7fa 60%,#b2ebf2 100%)', barColor:'#ffb300', dayCrops:['peach','bean','milk_c','sugar_c','tomato_c','basil_c'] },
+  { id:'autumn', name:'가을', emoji:'🍂', bg:'linear-gradient(160deg,#fff3e0 0%,#ffe0b2 60%,#ffcc80 100%)', barColor:'#e65100', dayCrops:['wheat','strawb','peach','sugar_c','potato_c','mushroom_c'] },
+  { id:'winter', name:'겨울', emoji:'❄️', bg:'linear-gradient(160deg,#e3f2fd 0%,#e8eaf6 60%,#c5cae9 100%)', barColor:'#5c6bc0', dayCrops:['bean','milk_c','wheat','meat_c','flour_c'] },
 ];
 
 const CROPS = {
-  wheat:   {emoji:'🌾',name:'밀',      growTime:20,cost:500,yield:10,gives:'wheat'},
-  strawb:  {emoji:'🍓',name:'딸기',    growTime:30,cost:1000,yield:8,gives:'strawb'},
-  peach:   {emoji:'🍑',name:'복숭아',  growTime:45,cost:1000,yield:8,gives:'peach'},
-  bean:    {emoji:'🫘',name:'커피콩',  growTime:50,cost:2500,yield:15,gives:'bean'},
-  milk_c:  {emoji:'🥛',name:'유제품',  growTime:25,cost:3000,yield:7,gives:'milk'},
-  sugar_c: {emoji:'🍬',name:'설탕수수',growTime:15,cost:1500,yield:25,gives:'sugar'},
+  // 기존
+  wheat:    {emoji:'🌾',name:'밀',      growTime:20, cost:500,  yield:10, gives:'wheat'},
+  strawb:   {emoji:'🍓',name:'딸기',    growTime:30, cost:1000, yield:8,  gives:'strawb'},
+  peach:    {emoji:'🍑',name:'복숭아',  growTime:45, cost:1000, yield:8,  gives:'peach'},
+  bean:     {emoji:'🫘',name:'커피콩',  growTime:50, cost:2500, yield:15, gives:'bean'},
+  milk_c:   {emoji:'🥛',name:'유제품',  growTime:25, cost:3000, yield:10,  gives:'milk'},
+  sugar_c:  {emoji:'🍬',name:'설탕수수',growTime:15, cost:1500, yield:25, gives:'sugar'},
+  // 2단계 이후
+  egg_c:    {emoji:'🥚',name:'달걀',    growTime:20, cost:800,  yield:12, gives:'egg'},
+  flour_c:  {emoji:'🌽',name:'밀가루',  growTime:18, cost:600,  yield:15, gives:'flour'},
+  // 4단계 이후
+  potato_c: {emoji:'🥔',name:'감자',    growTime:35, cost:1200, yield:10, gives:'potato'},
+  tomato_c: {emoji:'🍅',name:'토마토',  growTime:40, cost:1500, yield:8,  gives:'tomato'},
+  mushroom_c:{emoji:'🍄',name:'버섯',   growTime:50, cost:2000, yield:6,  gives:'mushroom'},
+  // 6단계 이후
+  meat_c:   {emoji:'🥩',name:'고기',    growTime:60, cost:5000, yield:5,  gives:'meat'},
+  basil_c:  {emoji:'🌿',name:'허브',    growTime:30, cost:2000, yield:10, gives:'basil'},
+  // 8단계 이후
+  truffle_c:{emoji:'⚫',name:'트러플',  growTime:90, cost:15000,yield:8,  gives:'truffle'},
+  cream_c:  {emoji:'🍶',name:'생크림',  growTime:35, cost:4000, yield:10,  gives:'cream'},
 };
 
 const ITEMS = {
-  wheat: {name:'밀',emoji:'🌾'}, strawb:{name:'딸기',emoji:'🍓'},
-  peach: {name:'복숭아',emoji:'🍑'}, bean:{name:'커피콩',emoji:'🫘'},
-  milk:  {name:'우유',emoji:'🥛'}, sugar:{name:'설탕',emoji:'🍬'},
+  wheat:   {name:'밀',    emoji:'🌾'}, strawb:  {name:'딸기',   emoji:'🍓'},
+  peach:   {name:'복숭아',emoji:'🍑'}, bean:    {name:'커피콩', emoji:'🫘'},
+  milk:    {name:'우유',  emoji:'🥛'}, sugar:   {name:'설탕',   emoji:'🍬'},
+  egg:     {name:'달걀',  emoji:'🥚'}, flour:   {name:'밀가루', emoji:'🌽'},
+  potato:  {name:'감자',  emoji:'🥔'}, tomato:  {name:'토마토', emoji:'🍅'},
+  mushroom:{name:'버섯',  emoji:'🍄'}, meat:    {name:'고기',   emoji:'🥩'},
+  basil:   {name:'허브',  emoji:'🌿'}, truffle: {name:'트러플', emoji:'⚫'},
+  cream:   {name:'생크림',emoji:'🍶'},
 };
 
-// stageReq: 0=농장개방, 1=노점, 2=소형카페, 3=카페, 4=프랜차이즈
-// season: null = 항상, 'spring','summer','autumn','winter' = 계절한정
+// stageReq: 0=농장, 1=노점, 2=토스트점, 3=분식점, 4=카페, 5=디저트카페, 6=비스트로, 7=레스토랑, 8=파인다이닝, 9=프랜차이즈
 const RECIPES = {
-  plain_cookie:   {emoji:'🍪',name:'플레인 쿠키',   price:1500,  stageReq:1, ingredients:{wheat:1,sugar:1},              learnCost:0,   season:null,     reviews:['바삭하고 고소해요!','쿠키가 완벽해요!','고소한 냄새~']},
-  strawb_cake:    {emoji:'🍰',name:'딸기 케이크',   price:5500, stageReq:1, ingredients:{wheat:1,strawb:1,sugar:1},     learnCost:1000, season:null,     reviews:['새콤달콤 최고!','딸기향이 좋아요~','친구한테 추천!']},
-  peach_tea:      {emoji:'🫖',name:'복숭아 티',     price:5000, stageReq:1, ingredients:{peach:1,sugar:1},              learnCost:1500,  season:null,     reviews:['복숭아향 진해요!','여름에 딱이에요~','향기 너무 좋아요']},
-  latte:          {emoji:'☕',name:'라떼',           price:4500, stageReq:2, ingredients:{bean:1,milk:1},               learnCost:1500, season:null,     reviews:['부드러운 라떼!','커피 향이 진해요!','진짜 카페 느낌~']},
-  strawb_latte:   {emoji:'🍓',name:'딸기 라떼',     price:6000, stageReq:3, ingredients:{bean:1,strawb:1,milk:1},      learnCost:1500, season:null,     reviews:['이 메뉴 진짜 맛있어요!','인스타에 올렸어요!','완전 특별해요!']},
-  peach_smoothie: {emoji:'🥤',name:'복숭아 스무디', price:6500, stageReq:3, ingredients:{peach:2,milk:1,sugar:1},      learnCost:1500, season:null,     reviews:['복숭아가 달콤해요!','시원하고 맛있어요!','매일 마시고 싶어요!']},
-  premium_set:    {emoji:'🎂',name:'프리미엄 세트', price:9500, stageReq:4, ingredients:{wheat:2,strawb:1,peach:1,milk:1,sugar:1}, learnCost:3000, season:null, reviews:['이런 건 처음이에요!','특별한 날에 딱!','최고급 맛!']},
-  spring_blossom: {emoji:'🌸',name:'봄꽃 라떼',     price:6500, stageReq:2, ingredients:{bean:1,milk:1,sugar:1},       learnCost:3000, season:'spring', reviews:['봄 느낌 물씬~','계절 한정이라 아쉬워요!','또 먹고 싶어요!']},
-  summer_ice:     {emoji:'🧊',name:'썸머 아이스티', price:7000, stageReq:2, ingredients:{peach:1,sugar:2},             learnCost:3000, season:'summer', reviews:['시원해서 너무 좋아요!','여름엔 이게 최고!','매일 마실 것 같아요!']},
-  autumn_latte:   {emoji:'🍂',name:'가을 호박 라떼',price:7000, stageReq:2, ingredients:{bean:1,milk:1,sugar:2},       learnCost:3000, season:'autumn', reviews:['가을 감성이에요!','호박향이 은은해요~','따뜻하고 좋아요!']},
-  winter_choco:   {emoji:'☃️',name:'겨울 핫초코',  price:6000, stageReq:2, ingredients:{milk:2,sugar:2},              learnCost:3000, season:'winter', reviews:['따뜻하고 달콤해요!','겨울에 딱!','몸이 녹는 것 같아요~']},
+  // ── 1단계: 노점 ──
+  egg_toast:    {emoji:'🍳',name:'계란 토스트',   price:2000, stageReq:1, ingredients:{flour:1,egg:1},              learnCost:0,    season:null,     reviews:['든든해요!','아침에 딱!','따뜻하고 맛있어요~']},
+  hotteok:      {emoji:'🥞',name:'호떡',          price:2500, stageReq:1, ingredients:{flour:1,sugar:1},            learnCost:500,  season:null,     reviews:['달콤해요!','길거리 감성~','바삭하고 맛있어요!']},
+  // ── 2단계: 토스트점 ──
+  ham_toast:    {emoji:'🥪',name:'햄치즈 토스트', price:3500, stageReq:2, ingredients:{flour:1,egg:1,milk:1},       learnCost:1000, season:null,     reviews:['치즈가 쭉쭉~','든든해요!','점심으로 딱!']},
+  strawb_toast: {emoji:'🍓',name:'딸기잼 토스트', price:3000, stageReq:2, ingredients:{flour:1,strawb:1,sugar:1},   learnCost:800,  season:null,     reviews:['달콤해요!','향기가 좋아요~','아이들이 좋아해요!']},
+  plain_cookie: {emoji:'🍪',name:'플레인 쿠키',   price:2500, stageReq:2, ingredients:{flour:1,sugar:1,egg:1},      learnCost:500,  season:null,     reviews:['바삭해요!','고소한 냄새~','커피랑 잘 어울려요!']},
+  // ── 3단계: 분식점 ──
+  tteokbokki:   {emoji:'🌶️',name:'떡볶이',       price:4000, stageReq:3, ingredients:{flour:2,tomato:1,sugar:1},   learnCost:2000, season:null,     reviews:['매콤달콤!','중독적이에요~','또 먹고 싶어요!']},
+  kimbap:       {emoji:'🍙',name:'김밥',          price:4500, stageReq:3, ingredients:{wheat:1,egg:1,mushroom:1},   learnCost:2000, season:null,     reviews:['꽉 찬 속재료!','소풍 필수템~','집밥 느낌!']},
+  sundae:       {emoji:'🌭',name:'순대',           price:3500, stageReq:3, ingredients:{meat:1,flour:1},             learnCost:1500, season:null,     reviews:['쫄깃해요!','분식집 느낌~','고소해요!']},
+  // ── 4단계: 카페 ──
+  latte:        {emoji:'☕',name:'라떼',           price:5500, stageReq:4, ingredients:{bean:1,milk:1},              learnCost:3000, season:null,     reviews:['부드러운 라떼!','커피 향이 진해요!','진짜 카페 느낌~']},
+  americano:    {emoji:'🖤',name:'아메리카노',     price:4500, stageReq:4, ingredients:{bean:2},                     learnCost:2000, season:null,     reviews:['진한 커피!','쌉싸름해요~','깔끔해요!']},
+  strawb_latte: {emoji:'🍓',name:'딸기 라떼',     price:6500, stageReq:4, ingredients:{bean:1,strawb:1,milk:1},     learnCost:3000, season:null,     reviews:['이 메뉴 최고!','인스타에 올렸어요!','또 주문했어요!']},
+  peach_tea:    {emoji:'🫖',name:'복숭아 티',      price:5000, stageReq:4, ingredients:{peach:1,sugar:1},            learnCost:2500, season:null,     reviews:['복숭아향 진해요!','향기 너무 좋아요~','힐링돼요!']},
+  // ── 5단계: 디저트 카페 ──
+  strawb_cake:  {emoji:'🍰',name:'딸기 케이크',   price:8000, stageReq:5, ingredients:{flour:1,strawb:2,cream:1},   learnCost:5000, season:null,     reviews:['예쁘고 맛있어요!','선물용으로 딱!','달콤해요~']},
+  macaron:      {emoji:'🧁',name:'마카롱',         price:6000, stageReq:5, ingredients:{flour:1,egg:1,sugar:2,cream:1},learnCost:4000,season:null,   reviews:['너무 예뻐요!','달달해요~','선물하기 좋아요!']},
+  waffle:       {emoji:'🧇',name:'와플',           price:7000, stageReq:5, ingredients:{flour:2,egg:1,milk:1},       learnCost:4000, season:null,     reviews:['바삭바삭!','시럽이랑 최고~','브런치 느낌!']},
+  peach_smoothie:{emoji:'🥤',name:'복숭아 스무디',price:6500, stageReq:5, ingredients:{peach:2,milk:1,sugar:1},     learnCost:3500, season:null,     reviews:['시원해요!','복숭아가 진해요~','여름에 딱!']},
+  // ── 6단계: 비스트로 ──
+  potato_soup:  {emoji:'🥣',name:'감자 수프',      price:9000, stageReq:6, ingredients:{potato:2,milk:1,basil:1},   learnCost:6000, season:null,     reviews:['따뜻하고 맛있어요!','크리미해요~','속이 편해요!']},
+  tomato_pasta: {emoji:'🍝',name:'토마토 파스타',  price:12000,stageReq:6, ingredients:{flour:2,tomato:2,basil:1},  learnCost:8000, season:null,     reviews:['정통 이탈리안!','소스가 진해요~','또 먹고 싶어요!']},
+  mushroom_risotto:{emoji:'🍚',name:'버섯 리조또',price:13000,stageReq:6, ingredients:{wheat:1,mushroom:2,milk:1,basil:1},learnCost:8000,season:null,reviews:['고급스러워요!','버섯향이 진해요~','레스토랑 느낌!']},
+  // ── 7단계: 레스토랑 ──
+  steak:        {emoji:'🥩',name:'스테이크',       price:25000,stageReq:7, ingredients:{meat:2,basil:1,mushroom:1},  learnCost:15000,season:null,    reviews:['육즙이 살아있어요!','완벽한 굽기!','최고의 스테이크!']},
+  burger:       {emoji:'🍔',name:'프리미엄 버거',  price:15000,stageReq:7, ingredients:{flour:1,meat:1,tomato:1,egg:1},learnCost:10000,season:null,  reviews:['패티가 두툼해요!','소스가 맛있어요~','최고의 버거!']},
+  // ── 8단계: 파인다이닝 ──
+  truffle_pasta:{emoji:'🖤',name:'트러플 파스타',  price:45000,stageReq:8, ingredients:{flour:2,truffle:1,cream:1,basil:1},learnCost:30000,season:null,reviews:['환상적이에요!','이런 맛은 처음!','럭셔리해요~']},
+  prime_steak:  {emoji:'🥇',name:'프라임 스테이크',price:60000,stageReq:8, ingredients:{meat:3,truffle:1,basil:1},   learnCost:40000,season:null,    reviews:['인생 스테이크!','완벽 그 자체!','별 다섯개!']},
+  // ── 9단계: 프랜차이즈 ──
+  premium_course:{emoji:'🎂',name:'프리미엄 코스', price:90000,stageReq:9, ingredients:{meat:2,truffle:1,cream:2,mushroom:1,basil:1},learnCost:60000,season:null,reviews:['인생 최고의 식사!','모든 게 완벽해요!','또 오고 싶어요!']},
+
+  // ── 계절 한정 ──
+  // 봄
+  spring_blossom:{emoji:'🌸',name:'봄꽃 라떼',    price:7000, stageReq:4, ingredients:{bean:1,milk:1,sugar:1},      learnCost:3000, season:'spring', reviews:['봄 느낌 물씬~','또 먹고 싶어요!','사진 찍었어요!']},
+  spring_strawb_crepe:{emoji:'🥞',name:'딸기 크레페',price:8000,stageReq:5,ingredients:{flour:1,strawb:2,cream:1},  learnCost:5000, season:'spring', reviews:['봄 딸기 최고!','크레페가 부드러워요~','예쁘게 나왔어요!']},
+  // 여름
+  summer_ice:   {emoji:'🧊',name:'썸머 아이스티',  price:7000, stageReq:4, ingredients:{peach:1,sugar:2},           learnCost:3000, season:'summer', reviews:['시원해요!','여름엔 이게 최고!','또 주문했어요!']},
+  summer_pasta: {emoji:'🍝',name:'냉파스타',        price:13000,stageReq:6, ingredients:{flour:2,tomato:2,basil:1},  learnCost:8000, season:'summer', reviews:['여름에 딱!','시원하고 맛있어요~','상큼해요!']},
+  // 가을
+  autumn_latte: {emoji:'🍂',name:'가을 호박 라떼',  price:7000, stageReq:4, ingredients:{bean:1,milk:1,sugar:2},    learnCost:3000, season:'autumn', reviews:['가을 감성!','호박향이 은은해요~','따뜻해요!']},
+  autumn_mushroom:{emoji:'🍄',name:'버섯 크림 수프',price:10000,stageReq:6, ingredients:{mushroom:2,cream:1,basil:1},learnCost:6000, season:'autumn', reviews:['가을 별미!','버섯향 진해요~','크리미해요!']},
+  // 겨울
+  winter_choco: {emoji:'☃️',name:'겨울 핫초코',    price:6500, stageReq:4, ingredients:{milk:2,sugar:2},            learnCost:3000, season:'winter', reviews:['따뜻해요!','겨울에 딱!','몸이 녹아요~']},
+  winter_stew:  {emoji:'🫕',name:'겨울 비프 스튜', price:20000,stageReq:7, ingredients:{meat:2,potato:1,tomato:1,basil:1},learnCost:12000,season:'winter',reviews:['겨울 최고의 음식!','따뜻하고 든든해요!','집밥보다 맛있어요!']},
 };
 
 const UPGRADES = {
-  fertilizer: {name:'비료 시스템',     emoji:'🌿',desc:'작물 성장 30% 단축',         cost:10000, stageReq:0},
-  display:     {name:'예쁜 진열대',    emoji:'🖼', desc:'손님 만족도 +10%',          cost:25000, stageReq:1},
-  espresso_m:  {name:'에스프레소 머신',emoji:'⚙️',desc:'커피류 재료 필요량 1개 절감', cost:15000, stageReq:2},
-  loyalty:     {name:'단골 카드',      emoji:'🃏',desc:'단골 손님 방문 빈도 +20%',   cost:40000, stageReq:2},
-  premium_mat: {name:'프리미엄 식재료',emoji:'✨',desc:'메뉴 판매가 +15%',           cost:20000, stageReq:3},
-  auto_harvest:{name:'자동 수확기',    emoji:'🚜',desc:'익은 작물 자동 수확',         cost:10000, stageReq:2},
+  fertilizer:  {name:'비료 시스템',     emoji:'🌿',desc:'작물 성장 30% 단축',          cost:10000,  stageReq:0},
+  display:      {name:'예쁜 진열대',    emoji:'🖼', desc:'손님 만족도 +10%',           cost:25000,  stageReq:1},
+  espresso_m:   {name:'에스프레소 머신',emoji:'⚙️',desc:'커피류 재료 필요량 1개 절감',  cost:15000,  stageReq:4},
+  loyalty:      {name:'단골 카드',      emoji:'🃏',desc:'단골 손님 방문 빈도 +20%',    cost:40000,  stageReq:3},
+  premium_mat:  {name:'프리미엄 식재료',emoji:'✨',desc:'메뉴 판매가 +15%',            cost:50000,  stageReq:5},
+  auto_harvest: {name:'자동 수확기',    emoji:'🚜',desc:'익은 작물 자동 수확',          cost:10000,  stageReq:2},
+  pro_kitchen:  {name:'전문 주방',      emoji:'🍳',desc:'조리 메뉴 판매가 +10%',       cost:80000,  stageReq:6},
+  wine_cellar:  {name:'와인 셀러',      emoji:'🍷',desc:'파인다이닝 메뉴 가격 +20%',   cost:150000, stageReq:8},
 };
 
-// STAFF definitions
-// role: 'farmer'=자동 씨앗 심기+수확, 'barista'=자동 서빙, 'manager'=재료 부족시 자동 보충
 const STAFF_DEFS = {
-  parttime: {name:'아르바이트생', emoji:'👧',role:'barista',  desc:'손님 1명 자동 서빙 (10마다)',   hireCost:15000, dailyCost:5000,  stageReq:1},
-  farmer_w: {name:'농장 일꾼',   emoji:'👨‍🌾',role:'farmer',   desc:'빈 밭에 자동으로 씨앗 심고 수확', hireCost:20000, dailyCost:6000,  stageReq:0},
-  barista:  {name:'바리스타',    emoji:'👨‍🍳',role:'barista',  desc:'손님 자동 서빙 (10초마다)',       hireCost:30000, dailyCost:10000, stageReq:2},
-  manager:  {name:'재료 관리자', emoji:'🧑‍💼',role:'manager',  desc:'부족한 재료 자동 파악 & 씨앗 심기',hireCost:50000, dailyCost:12000, stageReq:2},
-  head_chef:{name:'수석 셰프',   emoji:'👨‍🍳',role:'barista',  desc:'메뉴 판매가 +10% & 자동 서빙',   hireCost:70000,dailyCost:20000, stageReq:3},
+  parttime: {name:'아르바이트생', emoji:'👧',role:'barista',  desc:'손님 1명 자동 서빙',             hireCost:15000,  dailyCost:5000,  stageReq:1},
+  farmer_w: {name:'농장 일꾼',   emoji:'👨‍🌾',role:'farmer',   desc:'빈 밭에 자동으로 씨앗 심고 수확', hireCost:20000,  dailyCost:6000,  stageReq:0},
+  barista:  {name:'바리스타',    emoji:'☕',role:'barista',   desc:'손님 자동 서빙 (빠름)',           hireCost:30000,  dailyCost:10000, stageReq:4},
+  manager:  {name:'재료 관리자', emoji:'🧑‍💼',role:'manager',  desc:'부족한 재료 자동 파악 & 심기',    hireCost:50000,  dailyCost:12000, stageReq:3},
+  head_chef:{name:'수석 셰프',   emoji:'👨‍🍳',role:'barista',  desc:'메뉴 판매가 +10% & 자동 서빙',   hireCost:100000, dailyCost:25000, stageReq:6},
+  sommelier:{name:'소믈리에',    emoji:'🍷',role:'barista',   desc:'파인다이닝 손님 만족도 +30%',     hireCost:200000, dailyCost:50000, stageReq:8},
 };
 
 const STAGE_DATA = [
-  {name:'🌱 농장',       building:'🏕️',desc:'작물을 재배하고 재료를 모아보세요',     repReq:0},
-  {name:'🛖 노점',       building:'🛖', desc:'노점에서 첫 메뉴를 팔아보세요!',       repReq:100},
-  {name:'☕ 소형카페',   building:'🏠', desc:'다양한 메뉴로 손님을 맞이하세요',      repReq:400},
-  {name:'🏪 카페',       building:'🏪', desc:'본격 카페 운영으로 명성을 높이세요',   repReq:1000},
-  {name:'🏢 프랜차이즈', building:'🏢', desc:'전국 프랜차이즈 브랜드가 됐어요!',    repReq:2500},
+  {name:'🌱 농장',       building:'🏕️',desc:'작물을 재배하고 재료를 모아보세요',           repReq:0},
+  {name:'🛖 노점',       building:'🛖', desc:'길거리 노점으로 첫 장사를 시작해보세요!',    repReq:200},
+  {name:'🥪 토스트점',   building:'🏠', desc:'작은 토스트 가게를 운영해보세요',            repReq:600},
+  {name:'🍱 분식점',     building:'🏪', desc:'떡볶이, 김밥으로 손님을 모아보세요',         repReq:1500},
+  {name:'☕ 카페',       building:'☕', desc:'본격 카페! 커피와 디저트를 선보이세요',       repReq:3000},
+  {name:'🍰 디저트카페', building:'🎂', desc:'달콤한 디저트로 감성 카페를 꾸려보세요',     repReq:6000},
+  {name:'🍝 비스트로',   building:'🍝', desc:'파스타와 수프로 유럽식 감성을 더하세요',     repReq:11000},
+  {name:'🍽️ 레스토랑',  building:'🍽️',desc:'스테이크와 코스 요리로 격조를 높이세요',     repReq:20000},
+  {name:'🥂 파인다이닝', building:'🥂', desc:'트러플과 프라임 스테이크, 최고급 요리',      repReq:35000},
+  {name:'🏢 프랜차이즈', building:'🏢', desc:'전국 프랜차이즈 브랜드로 성장했어요!',      repReq:60000},
 ];
 
 // SPECIAL GUEST types
@@ -533,13 +588,17 @@ const SPECIAL_TYPES = {
 
 // STORY EVENTS (triggered at rep milestones or random)
 const STORY_EVENTS = [
-  {id:'rival_cafe',    triggerRep:200,  title:'🏪 경쟁 카페 등장!', text:'골목 맞은편에 새로운 카페가 오픈했어요. "리베라 카페" — 메뉴도 비슷하고 손님들이 비교하기 시작했어요.', choices:[{label:'품질로 승부하기',reward:{rep:30},msg:'품질 향상에 집중! 명성 +30'},{label:'프로모션 행사하기',reward:{money:20000,rep:10},msg:'할인 행사 진행! +200원 +명성10'}]},
-  {id:'regular_chan',  triggerRep:150,  title:'👴 단골손님 찬호 씨', text:'"저 여기 매일 오거든요. 오늘도 항상 먹던 거 주세요." 찬호 씨는 이제 카페의 숨은 홍보대사가 됐어요.', choices:[{label:'감사 선물 드리기',reward:{rep:50,money:-10000},msg:'찬호 씨 감동! 명성 +50'},{label:'메뉴 이름 붙여주기',reward:{rep:80},msg:'"찬호 특선" 탄생! 명성 +80'}]},
-  {id:'food_magazine', triggerRep:500,  title:'📰 잡지 취재 요청!', text:'지역 음식 잡지에서 취재 요청이 왔어요. 기사가 실리면 대박날 수도 있어요!', choices:[{label:'취재 수락하기',reward:{rep:150},msg:'잡지 기사 게재! 명성 +150'},{label:'정중히 거절하기',reward:{money:0},msg:'다음 기회로...'}]},
-  {id:'staff_story',   triggerRep:300,  title:'👧 아르바이트생 소연', text:'"사장님, 저 카페 창업이 꿈이에요. 많이 배우고 싶어요!" 소연이의 열정이 카페 분위기를 밝게 만들어요.', choices:[{label:'열심히 가르쳐주기',reward:{rep:40},msg:'소연이 성장! 명성 +40'},{label:'카페 운영 노하우 전수',reward:{rep:80,money:-5000},msg:'소연이 감동! 명성 +80'}]},
-  {id:'rainy_day',     triggerRep:0,    title:'🌧 비 오는 날', text:'갑자기 비가 내리기 시작했어요. 빗소리와 함께 카페 안이 더 아늑해진 것 같아요. 손님들이 더 오래 머물러요.', choices:[{label:'무료 음료 한 잔 제공',reward:{rep:60,money:-8000},msg:'따뜻한 서비스! 명성 +60'},{label:'분위기 음악 틀기',reward:{rep:30},msg:'카페 분위기 UP! 명성 +30'}]},
-  {id:'celeb_visit',   triggerRep:800,  title:'🌟 연예인 방문!', text:'SNS에서 화제인 인플루언서가 카페에 왔어요! 이미 팔로워들에게 위치를 공유했다고 해요.', choices:[{label:'특별 서비스 제공',reward:{rep:200,money:-15000},msg:'SNS 대박! 명성 +200'},{label:'자연스럽게 응대하기',reward:{rep:100},msg:'쿨한 대응! 명성 +100'}]},
-  {id:'health_dept',   triggerRep:600,  title:'🏥 위생 점검 방문', text:'보건소에서 위생 점검 나왔어요. 평소 청결 관리를 잘 했다면 문제없겠죠?', choices:[{label:'자신 있게 보여주기',reward:{rep:50},msg:'우수 판정! 명성 +50'},{label:'긴장해서 실수하기',reward:{rep:-30,money:-10000},msg:'지적 사항 몇 가지... 명성 -30'}]},
+  {id:'rival_cafe',     triggerRep:300,   title:'🏪 경쟁 가게 등장!',     text:'골목 맞은편에 새로운 가게가 오픈했어요. 메뉴도 비슷하고 손님들이 비교하기 시작했어요.', choices:[{label:'품질로 승부하기',reward:{rep:50},msg:'품질 향상에 집중! 명성 +50'},{label:'프로모션 행사하기',reward:{money:20000,rep:20},msg:'할인 행사 진행! 명성 +20'}]},
+  {id:'regular_chan',   triggerRep:250,   title:'👴 단골손님 찬호 씨',     text:'"저 여기 매일 오거든요. 오늘도 항상 먹던 거 주세요." 찬호 씨는 이제 가게의 숨은 홍보대사가 됐어요.', choices:[{label:'감사 선물 드리기',reward:{rep:80,money:-10000},msg:'찬호 씨 감동! 명성 +80'},{label:'메뉴 이름 붙여주기',reward:{rep:120},msg:'"찬호 특선" 탄생! 명성 +120'}]},
+  {id:'food_magazine',  triggerRep:800,   title:'📰 잡지 취재 요청!',     text:'지역 음식 잡지에서 취재 요청이 왔어요. 기사가 실리면 대박날 수도 있어요!', choices:[{label:'취재 수락하기',reward:{rep:300},msg:'잡지 기사 게재! 명성 +300'},{label:'정중히 거절하기',reward:{money:0},msg:'다음 기회로...'}]},
+  {id:'staff_story',    triggerRep:500,   title:'👧 아르바이트생 소연',   text:'"사장님, 저 창업이 꿈이에요. 많이 배우고 싶어요!" 소연이의 열정이 가게 분위기를 밝게 만들어요.', choices:[{label:'열심히 가르쳐주기',reward:{rep:80},msg:'소연이 성장! 명성 +80'},{label:'운영 노하우 전수',reward:{rep:150,money:-5000},msg:'소연이 감동! 명성 +150'}]},
+  {id:'rainy_day',      triggerRep:0,     title:'🌧 비 오는 날',           text:'갑자기 비가 내리기 시작했어요. 빗소리와 함께 가게 안이 더 아늑해진 것 같아요.', choices:[{label:'무료 음료 한 잔 제공',reward:{rep:100,money:-8000},msg:'따뜻한 서비스! 명성 +100'},{label:'분위기 음악 틀기',reward:{rep:50},msg:'분위기 UP! 명성 +50'}]},
+  {id:'celeb_visit',    triggerRep:2000,  title:'🌟 연예인 방문!',         text:'SNS에서 화제인 인플루언서가 왔어요! 팔로워들에게 위치를 공유했다고 해요.', choices:[{label:'특별 서비스 제공',reward:{rep:500,money:-15000},msg:'SNS 대박! 명성 +500'},{label:'자연스럽게 응대하기',reward:{rep:250},msg:'쿨한 대응! 명성 +250'}]},
+  {id:'health_dept',    triggerRep:1200,  title:'🏥 위생 점검 방문',       text:'보건소에서 위생 점검 나왔어요. 평소 청결 관리를 잘 했다면 문제없겠죠?', choices:[{label:'자신 있게 보여주기',reward:{rep:100},msg:'우수 판정! 명성 +100'},{label:'긴장해서 실수하기',reward:{rep:-50,money:-10000},msg:'지적 사항 몇 가지... 명성 -50'}]},
+  {id:'new_recipe',     triggerRep:4000,  title:'👨‍🍳 셰프의 새 레시피',   text:'수석 셰프가 특별한 레시피를 개발했어요. 시그니처 메뉴가 생길 것 같아요!', choices:[{label:'메뉴에 바로 추가',reward:{rep:300},msg:'시그니처 메뉴 탄생! 명성 +300'},{label:'더 연구하기',reward:{rep:150,money:-20000},msg:'완벽한 레시피 완성! 명성 +150'}]},
+  {id:'michelin',       triggerRep:8000,  title:'⭐ 미식 평론가 방문!',    text:'유명 미식 평론가가 몰래 방문했어요. 리뷰가 어떻게 나올지 두근두근해요.', choices:[{label:'최선을 다해 서빙',reward:{rep:800},msg:'별점 만점! 명성 +800'},{label:'평소대로 운영',reward:{rep:400},msg:'좋은 평가! 명성 +400'}]},
+  {id:'franchise_offer',triggerRep:15000, title:'🏢 프랜차이즈 제안!',    text:'대형 외식 기업에서 프랜차이즈 계약을 제안해왔어요. 전국구 브랜드가 될 기회예요!', choices:[{label:'계약 수락하기',reward:{rep:2000},msg:'전국 진출 시작! 명성 +2000'},{label:'독립 브랜드 유지',reward:{rep:1000,money:500000},msg:'나만의 브랜드 고수! 명성 +1000'}]},
+  {id:'award',          triggerRep:30000, title:'🏆 올해의 레스토랑 수상!', text:'권위 있는 외식 어워드에서 올해의 레스토랑으로 선정됐어요! 수많은 축하 인사가 쏟아지고 있어요.', choices:[{label:'수상 소감 발표',reward:{rep:3000},msg:'감동의 수상! 명성 +3000'},{label:'직원들과 파티',reward:{rep:2000,money:-100000},msg:'함께여서 가능했어요! 명성 +2000'}]},
 ];
 
 const CUST_NAMES  = ['민준','서연','지호','예은','준서','하은','도현','소율','재원','나연','시우','지아','건우','다은','현준','태양','하린','유진','찬호','보미','서연','다솜','국화','에스더','영현','소호','정훈','정우','석주','일향','혜진','규연','민현'];
@@ -554,8 +613,8 @@ let G = {
   paused:false, secondsPlayed:0, dayTimer:0,
   seasonIndex:0, seasonDay:1,
   plots:Array(8).fill(null).map(()=>({crop:null,plantedAt:null,growTime:null,stage:'empty'})),
-  inventory:{wheat:0,strawb:0,peach:0,bean:0,milk:0,sugar:0},
-  learnedRecipes:['plain_cookie'],
+  inventory:{wheat:0,strawb:0,peach:0,bean:0,milk:0,sugar:0,egg:0,flour:0,potato:0,tomato:0,mushroom:0,meat:0,basil:0,truffle:0,cream:0},
+  learnedRecipes:['egg_toast'],
   upgrades:[],
   staff:{},      // {staffId: true}
   customers:[],
@@ -646,8 +705,8 @@ function tick() {
       G.money=Math.max(0,G.money-wages);
       addLog(`💸 직원 일급 -${wages}원`);
     }
-    // Season change (every 10 game-days)
-    if (G.seasonDay>10) { G.seasonDay=1; advanceSeason(); }
+    // Season change (every 30 game-days)
+    if (G.seasonDay>30) { G.seasonDay=1; advanceSeason(); }
     addLog(`📅 Day ${G.day} 시작! (${SEASONS[G.seasonIndex].name})`);
     saveToStorage();
     renderSeasonStrip();
