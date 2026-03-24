@@ -214,15 +214,16 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
 ─────────────────────────────── */
 @media (max-width: 768px) {
 
+  /* grid → block 으로 변경해야 sticky 헤더가 작동 */
+  #app { display: block; padding: 0 8px 72px; }
+
   /* 헤더 상단 고정 */
   header {
     position: sticky; top: 0; z-index: 90;
     padding: 8px 12px; gap: 8px;
     border-radius: 0 0 12px 12px;
+    margin-bottom: 6px;
   }
-
-  /* 헤더 고정 + 하단 탭바 공간 확보 */
-  #app { padding: 0 8px 72px; gap: 6px; }
 
   .brand-name { font-size: 15px; }
   .brand-sub, #season-badge { display: none; }
@@ -235,10 +236,13 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
   /* 3열 그리드 해제 */
   #game-main { display: block; }
 
-  /* 각 열: 기본 숨김 */
+  /* 각 열 기본 스타일 + 숨김 */
   #col-farm, #col-cafe, #col-manage {
-    display: none; flex-direction: column; gap: 8px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
   }
+  /* 활성 열만 표시 */
   #col-farm.tab-show   { display: flex; }
   #col-cafe.tab-show   { display: flex; }
   #col-manage.tab-show { display: flex; }
@@ -356,7 +360,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
 
   <div id="game-main">
     <!-- LEFT -->
-    <div id="col-farm" class="tab-show" style="display:flex;flex-direction:column;gap:8px;">
+    <div id="col-farm" class="tab-show">
       <div class="panel">
         <div class="panel-title">🌾 농장</div>
         <div class="season-strip">
@@ -381,7 +385,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
     </div>
 
     <!-- CENTER -->
-    <div id="col-cafe" style="display:flex;flex-direction:column;gap:8px;">
+    <div id="col-cafe">
       <div id="cafe-center">
         <div id="cafe-locked">
           <div class="lock-icon">🔐</div>
@@ -420,7 +424,7 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
     </div>
 
     <!-- RIGHT: 직원/업그레이드 탭 + 리뷰 -->
-    <div id="col-manage" style="display:flex;flex-direction:column;gap:8px;">
+    <div id="col-manage">
       <div class="panel">
         <div class="tab-bar">
           <button class="tab-btn active" onclick="switchTab('staff')">👥 직원</button>
