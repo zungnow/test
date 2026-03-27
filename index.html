@@ -586,12 +586,12 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
       <div class="panel">
         <div id="contest-banner-manage-desktop"></div>
         <div class="tab-bar">
-          <button class="tab-btn active" onclick="switchTab('staff')">👥 직원</button>
-          <button class="tab-btn" onclick="switchTab('upgrades')">🔧 설정</button>
-          <button class="tab-btn" onclick="switchTab('booster')">⚡ 버프</button>
-          <button class="tab-btn" onclick="switchTab('achieve')">🏅 업적</button>
-          <button class="tab-btn" onclick="switchTab('encyclo')">📖 도감</button>
-          <button class="tab-btn" onclick="switchTab('stats')">📊 통계</button>
+          <button class="tab-btn active" onclick="switchTab('staff')">👥<br>직원</button>
+          <button class="tab-btn" onclick="switchTab('upgrades')">🔧<br>설정</button>
+          <button class="tab-btn" onclick="switchTab('booster')">⚡<br>버프</button>
+          <button class="tab-btn" onclick="switchTab('achieve')">🏅<br>업적</button>
+          <button class="tab-btn" onclick="switchTab('encyclo')">📖<br>도감</button>
+          <button class="tab-btn" onclick="switchTab('stats')">📊<br>통계</button>
         </div>
         <div class="tab-pane active" id="tab-staff"></div>
         <div class="tab-pane" id="tab-upgrades"></div>
@@ -2877,7 +2877,7 @@ const ACHIEVEMENTS = [
   {id:'serve_10',      emoji:'👨‍🍳', name:'열정 사장',       desc:'손님 10명 서빙',                    check:()=>G.totalServed>=10},
   {id:'serve_100',     emoji:'🏅', name:'백전노장',          desc:'손님 100명 서빙',                   check:()=>G.totalServed>=100},
   {id:'serve_500',     emoji:'🏆', name:'전설의 서빙왕',     desc:'손님 500명 서빙',                   check:()=>G.totalServed>=500},
-  {id:'money_100k',    emoji:'💰', name:'백만장자의 꿈',     desc:'10만원 보유',                       check:()=>G.money>=100000},
+  {id:'money_100k',    emoji:'💰', name:'백만장자의 꿈',     desc:'50만원 보유',                       check:()=>G.money>=500000},
   {id:'money_1m',      emoji:'💎', name:'백만장자!',          desc:'100만원 보유',                      check:()=>G.money>=1000000},
   {id:'money_10m',     emoji:'👑', name:'재벌 사장님',        desc:'1000만원 보유',                     check:()=>G.money>=10000000},
   {id:'earned_1m',     emoji:'🤑', name:'누적 백만',          desc:'누적 수익 100만원',                 check:()=>G.totalMoneyEarned>=1000000},
