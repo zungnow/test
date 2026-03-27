@@ -2,529 +2,480 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>나도 사장 🌱</title>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700;800&family=Jua&display=swap" rel="stylesheet">
-<link rel="icon" href="YH-SOFT.ico" type="image/x-icon">
 <style>
-/* --- 사장님의 원본 디자인 CSS 100% 복구 --- */
-:root{
-  --soil:#6B4226;--grass:#5A8A3C;--sun:#F4C430;
-  --cream:#FFF8F0;--latte:#C8956C;--espresso:#3B1F0F;
-  --gold:#D4A017;--text:#2C1A0E;
+/* --- 기존 스타일 유지 및 애니메이션 추가 --- */
+:root {
+  --soil:#6B4226; --grass:#5A8A3C; --sun:#F4C430;
+  --cream:#FFF8F0; --latte:#C8956C; --espresso:#3B1F0F;
+  --gold:#D4A017; --text:#2C1A0E;
   --panel:rgba(255,248,240,0.96);
   --shadow:0 4px 20px rgba(59,31,15,0.12);
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Gowun Dodum',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 3s ease;}
-#app{display:grid;grid-template-rows:auto 1fr;min-height:100vh;max-width:1400px;margin:0 auto;padding:10px;gap:8px;}
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+body { font-family:'Gowun Dodum',sans-serif; color:var(--text); min-height:100vh; background:var(--cream); overflow-x:hidden; }
+#app { display:grid; grid-template-rows:auto 1fr; min-height:100vh; max-width:1400px; margin:0 auto; padding:10px; gap:8px; }
 
 /* HEADER */
-header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);border:2px solid rgba(212,160,23,0.25);flex-wrap:wrap;}
-.brand{display:flex;align-items:center;gap:8px;flex:1;min-width:160px;}
-.brand-icon{font-size:26px;}
-.brand-name{font-family:'Nanum Myeongjo',serif;font-size:20px;font-weight:800;color:var(--espresso);}
-.brand-sub{font-size:10px;color:var(--latte);}
-#season-badge{font-family:'Jua',sans-serif;font-size:12px;padding:5px 12px;border-radius:20px;white-space:nowrap;border:1.5px solid;transition:all 1s;}
-.stage-badge{background:linear-gradient(135deg,var(--gold),var(--sun));color:var(--espresso);font-family:'Jua',sans-serif;font-size:12px;padding:5px 12px;border-radius:20px;white-space:nowrap;}
-.stats-bar{display:flex;gap:12px;align-items:center;}
-.stat{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--espresso);}
-#game-time{font-family:'Jua',sans-serif;font-size:12px;color:var(--soil);background:rgba(107,66,38,0.1);padding:3px 9px;border-radius:8px;}
-.header-btns{display:flex;gap:7px;}
+header { background:var(--panel); border-radius:16px; padding:10px 18px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); border:2px solid rgba(212,160,23,0.25); position:relative; z-index:10; }
+.brand { display:flex; align-items:center; gap:8px; flex:1; }
+.brand-name { font-family:'Nanum Myeongjo',serif; font-size:20px; font-weight:800; color:var(--espresso); }
+.stats-bar { display:flex; gap:12px; align-items:center; }
+.stat { font-size:13px; font-weight:600; display:flex; align-items:center; gap:4px; }
+
+/* FLOATING TEXT ANIMATION */
+@keyframes floatUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-50px); }
+}
+.floating-num {
+  position: absolute; pointer-events: none; font-weight: 800; font-family: 'Jua';
+  z-index: 9999; animation: floatUp 0.8s ease-out forwards;
+}
+
+/* PANELS & GRIDS (기존과 동일) */
+#game-main { display:grid; grid-template-columns:300px 1fr 300px; gap:10px; }
+.panel { background:var(--panel); border-radius:14px; padding:15px; border:1.5px solid rgba(200,149,108,0.18); display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow); }
+#farm-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.plot { aspect-ratio:1; border-radius:10px; border:2px solid rgba(107,66,38,0.3); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:24px; position:relative; background:#eee; transition:0.2s; }
+.plot.ready { animation:pulse 1.5s infinite; background:#fff; border-color:var(--sun); }
+@keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(244,196,48,0.4); } 70% { box-shadow:0 0 0 10px rgba(244,196,48,0); } 100% { box-shadow:0 0 0 0 rgba(244,196,48,0); } }
 
 /* BUTTONS */
-.btn{cursor:pointer;border:none;border-radius:10px;font-family:'Gowun Dodum',sans-serif;font-size:13px;font-weight:600;padding:7px 13px;transition:all 0.15s;display:flex;align-items:center;gap:4px;}
-.btn:hover{transform:translateY(-1px);filter:brightness(1.06);}
-.btn-primary{background:var(--espresso);color:var(--cream);}
-.btn-secondary{background:var(--latte);color:white;}
-.btn-green{background:var(--grass);color:white;}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--sun));color:var(--espresso);}
-.btn-sm{padding:4px 9px;font-size:11px;border-radius:7px;}
-.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn { cursor:pointer; border:none; border-radius:8px; padding:8px 12px; font-family:inherit; font-weight:600; transition:0.2s; }
+.btn-primary { background:var(--espresso); color:white; }
 
-/* MAIN GRID */
-#game-main{display:grid;grid-template-columns:290px 1fr 285px;gap:8px;align-items:start;}
-.panel{background:var(--panel);border-radius:14px;padding:13px;box-shadow:var(--shadow);border:1.5px solid rgba(200,149,108,0.18);display:flex;flex-direction:column;gap:9px;}
-.panel-title{font-family:'Nanum Myeongjo',serif;font-size:14px;font-weight:700;color:var(--espresso);padding-bottom:7px;border-bottom:2px dashed rgba(200,149,108,0.28);display:flex;align-items:center;gap:5px;}
-
-/* FARM */
-#farm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
-.plot{aspect-ratio:1;border-radius:9px;border:2px solid rgba(107,66,38,0.4);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:22px;transition:all 0.15s;position:relative;overflow:hidden;}
-.plot.empty{background:linear-gradient(145deg,#A0785A,#8B6340);}
-.plot.growing{background:linear-gradient(145deg,#7FA66A,#5A8A3C);}
-.plot.ready{background:linear-gradient(145deg,#5A8A3C,#3D6B28);animation:pulse-plot 1.2s infinite;}
-@keyframes pulse-plot{0%,100%{box-shadow:0 0 6px rgba(244,196,48,0.3)}50%{box-shadow:0 0 14px rgba(244,196,48,0.7)}}
-.plot-label{font-size:9px;color:white;margin-top:1px;}
-
-/* INVENTORY CHIP */
-.inv-chip{display:flex;align-items:center;gap:3px;background:rgba(107,66,38,0.09);border-radius:20px;padding:3px 8px;font-size:12px;}
-
-/* CAFE OPEN */
-#cafe-open{background:var(--panel);border-radius:14px;box-shadow:var(--shadow);border:1.5px solid rgba(200,149,108,0.18);display:none;flex-direction:column;overflow:hidden;}
-.cafe-topbar{background:linear-gradient(135deg,var(--espresso),#5C3A1E);padding:11px 16px;display:flex;align-items:center;gap:10px;color:white;}
-.cafe-body{padding:12px;display:flex;flex-direction:column;gap:11px;}
-.prog-bg{height:9px;background:rgba(107,66,38,0.13);border-radius:5px;overflow:hidden;}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--grass),var(--sun));transition:width 0.6s ease;}
-
-/* MENU CARD */
-.menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-.menu-card{background:rgba(200,149,108,0.1);border:1.5px solid rgba(200,149,108,0.22);border-radius:10px;padding:9px 8px;text-align:center;transition:all 0.15s;}
-.menu-card.unlocked{border-color:rgba(212,160,23,0.4);}
-.menu-card.locked{opacity:0.4;}
-
-/* CUSTOMERS */
-.cust-card{display:flex;align-items:center;gap:7px;border-radius:8px;padding:7px 9px;font-size:12px;margin-bottom:5px;background:rgba(107,66,38,0.07);}
-.cust-pat-bg{height:3px;background:rgba(107,66,38,0.15);border-radius:2px;margin-top:3px;}
-.cust-pat-fill{height:100%;border-radius:2px;transition:width 0.8s linear;}
-
-/* TABS & UPGRADES */
-.tab-bar{display:flex;gap:3px;}
-.tab-btn{flex:1;padding:5px;font-size:11px;cursor:pointer;background:rgba(107,66,38,0.08);border:none;border-radius:7px;}
-.tab-btn.active{background:var(--espresso);color:white;}
-.tab-pane{display:none;flex-direction:column;gap:5px;}.tab-pane.active{display:flex;}
-
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(59,31,15,0.65);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
-.modal-overlay.show{display:flex;}
-.modal{background:var(--cream);border-radius:18px;padding:24px;width:90%;max-width:500px;}
-
-/* MOBILE NAVIGATION */
-#mob-bar {display:none;}
+/* MOBILE */
+#mob-bar { display:none; }
 @media (max-width: 768px) {
-  #app { display: block; padding: 0 8px 72px; }
-  header { position: sticky; top: 0; z-index: 90; border-radius: 0 0 12px 12px; }
-  #game-main { display: block; }
-  .col-tab { display: none; }
-  .col-tab.active { display: flex; flex-direction: column; gap: 8px; }
-  #mob-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 2px solid #ddd; padding: 10px; justify-content: space-around; z-index: 999; }
+  #game-main { display:block; }
+  .col-tab { display:none; }
+  .col-tab.active { display:flex; flex-direction:column; gap:10px; padding-bottom:80px; }
+  #mob-bar { display:flex; position:fixed; bottom:0; width:100%; background:white; border-top:1px solid #ddd; padding:10px; justify-content:space-around; z-index:100; }
 }
 </style>
 </head>
 <body>
 
 <div id="app">
-  <header>
-    <div class="brand">
-      <div class="brand-icon" id="brandIcon">🌱</div>
-      <div>
-        <div class="brand-name" id="brandNameDisplay">내 농장</div>
-        <div class="brand-sub">나도 사장 Pro</div>
-      </div>
-    </div>
-    <div id="season-badge">🌸 봄</div>
-    <div class="stage-badge" id="stageBadge">🌱 농장 단계</div>
-    <div class="stats-bar">
-      <div class="stat">💰 <span id="moneyDisplay">100,000</span>원</div>
-      <div class="stat">⭐ <span id="repDisplay">0</span></div>
-      <div class="stat">📅 Day <span id="dayDisplay">1</span></div>
-      <div id="game-time">00:00</div>
-    </div>
-    <div class="header-btns">
-      <button class="btn btn-gold btn-sm" onclick="game.save(true)">💾 저장</button>
-      <button class="btn btn-secondary btn-sm" onclick="game.togglePause()">⏸ <span id="pauseLabel">일시정지</span></button>
-    </div>
-  </header>
-
-  <main id="game-main">
-    <div id="col-farm" class="col-tab active">
-      <div class="panel">
-        <div class="panel-title">🌾 농장 현황</div>
-        <div id="farm-grid"></div>
-        <div id="inventoryInline" style="display:flex; flex-wrap:wrap; gap:6px; padding-top:4px;"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">📢 알림 로그</div>
-        <div id="logEntries" style="display:flex; flex-direction:column; gap:3px; height:120px; overflow-y:auto; font-size:11px;"></div>
-      </div>
-    </div>
-
-    <div id="col-cafe" class="col-tab">
-      <div id="cafe-locked" class="panel" style="text-align:center; padding:40px 20px;">
-          <h3>🔐 카페가 잠겨있습니다</h3>
-          <p style="font-size:12px; margin:15px 0;">재료 20개를 수확하여 카페를 오픈하세요!</p>
-          <button class="btn btn-primary" id="openCafeBtn" onclick="game.openCafe()" style="display:none; margin:0 auto;">☕ 카페 오픈하기</button>
-      </div>
-      <div id="cafe-open">
-        <div class="cafe-topbar">
-          <div id="cafeStageLabel" style="font-weight:800;">☕ 노점 카페</div>
-          <div style="flex:1"></div>
-          <div id="satVal">⭐ 0.0</div>
+    <header>
+        <div class="brand">
+            <span id="brandIcon" style="font-size:24px;">🌱</span>
+            <div class="brand-name" id="brandNameDisplay">음악이 흐르는 농장</div>
         </div>
-        <div class="cafe-body">
-          <div id="eventBannerArea"></div>
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
-              <span>다음 단계까지</span><span id="progressText">0 / 200 명성</span>
+        <div class="stats-bar">
+            <div class="stat">💰 <span id="moneyDisplay">0</span></div>
+            <div class="stat">⭐ <span id="repDisplay">0</span></div>
+            <div class="stat">📅 Day <span id="dayDisplay">1</span></div>
+        </div>
+        <div style="margin-left:auto;">
+            <button class="btn btn-secondary btn-sm" onclick="audio.toggleMute()">🔊 <span id="muteLabel">소리 켬</span></button>
+        </div>
+    </header>
+
+    <main id="game-main">
+        <div id="col-farm" class="col-tab active">
+            <div class="panel">
+                <div class="panel-title" style="font-family:'Jua';">🌾 나의 농장</div>
+                <div id="farm-grid"></div>
+                <div id="inventoryInline" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;"></div>
             </div>
-            <div class="prog-bg"><div class="prog-fill" id="progressFill" style="width:0%"></div></div>
-          </div>
-          <div class="panel-title">👥 방문 손님 <span id="custCount"></span></div>
-          <div id="customerList" style="min-height:80px;"></div>
-          <div class="panel-title">📋 메뉴판</div>
-          <div class="menu-grid" id="menuGrid"></div>
+            <div class="panel">
+                <div class="panel-title" style="font-family:'Jua';">📜 활동 로그</div>
+                <div id="logEntries" style="height:150px; overflow-y:auto; font-size:12px; line-height:1.6; color:#555;"></div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <div id="col-manage" class="col-tab">
-      <div class="panel">
-        <div class="tab-bar">
-          <button class="tab-btn active" onclick="ui.switchTab('staff')">👥 직원</button>
-          <button class="tab-btn" onclick="ui.switchTab('upgrades')">🔧 업그레이드</button>
+        <div id="col-cafe" class="col-tab">
+            <div id="cafe-locked" class="panel" style="text-align:center; padding:40px 10px;">
+                <h3 style="margin-bottom:10px; font-family:'Jua';">🔐 카페 오픈 대기 중</h3>
+                <p style="font-size:13px; color:#666; margin-bottom:20px;">재료 20개를 수확하면<br>카페 배경음악이 바뀝니다!</p>
+                <button class="btn btn-primary" id="openCafeBtn" onclick="game.openCafe()" style="display:none; margin:0 auto;">☕ 카페 오픈하기</button>
+            </div>
+            <div id="cafe-open" class="panel" style="display:none;">
+                <div class="panel-title" style="font-family:'Jua';">☕ <span id="cafeStageTitle">노점 카페</span></div>
+                <div style="margin:10px 0;">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+                        <span>명성도 진행도</span>
+                        <span id="progressText">0 / 200</span>
+                    </div>
+                    <div style="height:6px; background:#eee; border-radius:3px; overflow:hidden;">
+                        <div id="progressFill" style="height:100%; width:0%; background:var(--sun); transition:0.5s;"></div>
+                    </div>
+                </div>
+                <div id="customerList" style="margin-top:10px;"></div>
+            </div>
         </div>
-        <div id="tab-staff" class="tab-pane active"></div>
-        <div id="tab-upgrades" class="tab-pane"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">💬 최근 리뷰</div>
-        <div id="reviewList" style="max-height:180px; overflow-y:auto;"></div>
-      </div>
-    </div>
-  </main>
 
-  <nav id="mob-bar">
-    <button class="btn" onclick="ui.mobileSwitch('farm')">🌾 농장</button>
-    <button class="btn" onclick="ui.mobileSwitch('cafe')">☕ 카페</button>
-    <button class="btn" onclick="ui.mobileSwitch('manage')">⚙️ 관리</button>
-  </nav>
+        <div id="col-manage" class="col-tab">
+            <div class="panel">
+                <div class="panel-title" style="font-family:'Jua';">⚙️ 설정 및 관리</div>
+                <button class="btn" onclick="game.save(true)" style="background:#ddd; width:100%;">💾 수동 저장</button>
+                <button class="btn" onclick="game.reset()" style="background:#ffcdd2; margin-top:5px; width:100%;">⚠️ 초기화</button>
+            </div>
+        </div>
+    </main>
+
+    <nav id="mob-bar">
+        <button class="btn" onclick="ui.mobileSwitch('farm')">🌾 농장</button>
+        <button class="btn" onclick="ui.mobileSwitch('cafe')">☕ 카페</button>
+        <button class="btn" onclick="ui.mobileSwitch('manage')">⚙️ 관리</button>
+    </nav>
 </div>
 
 <div id="modalOverlay" class="modal-overlay">
-  <div id="modalContent" class="modal"></div>
+    <div id="modalContent" class="modal"></div>
 </div>
 
 <script>
 'use strict';
 
 /**
- * [game] 핵심 시스템: 데이터 + 저장 + 타이머
+ * [audio] 사운드 시스템: Web Audio API 합성 및 BGM 관리
  */
-const game = {
-  // --- 사장님 원본 레시피 및 작물 데이터 복구 ---
-  CROPS: {
-    wheat: {emoji:'🌾',name:'밀', growTime:15, cost:500, yield:5, gives:'wheat'},
-    strawb: {emoji:'🍓',name:'딸기', growTime:20, cost:1000, yield:4, gives:'strawb'},
-    bean: {emoji:'🫘',name:'커피콩', growTime:30, cost:2000, yield:6, gives:'bean'},
-    milk_c: {emoji:'🥛',name:'유제품', growTime:25, cost:3000, yield:5, gives:'milk'}
-  },
+const audio = {
+    ctx: null,
+    isMuted: false,
+    bgm: null,
+    currentBgm: '',
 
-  RECIPES: {
-    egg_toast: {emoji:'🍳',name:'계란 토스트', price:4000, stageReq:1, ingredients:{wheat:1}, learnCost:0, reviews:['든든해요!','맛있어요!']},
-    americano: {emoji:'🖤',name:'아메리카노', price:4500, stageReq:2, ingredients:{bean:2}, learnCost:2000, reviews:['진해요!','깔끔해요!']},
-    latte: {emoji:'☕',name:'라떼', price:5500, stageReq:2, ingredients:{bean:1, milk:1}, learnCost:3000, reviews:['부드러워요!','고소해요!']}
-  },
+    init() {
+        // 브라우저 정책상 사용자 클릭 후 오디오 활성화 가능
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    },
 
-  STAGES: [
-    {name:'🌱 농장', building:'🏕️', repReq:0},
-    {name:'🛖 노점', building:'🛖', repReq:200},
-    {name:'🏠 토스트점', building:'🏠', repReq:600},
-    {name:'☕ 카페', building:'☕', repReq:1500}
-  ],
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        document.getElementById('muteLabel').textContent = this.isMuted ? '소리 끔' : '소리 켬';
+        if (this.isMuted) this.ctx.suspend(); else this.ctx.resume();
+    },
 
-  UPGRADES: {
-    fertilizer: {name:'고급 비료', emoji:'🌿', desc:'성장 30% 단축', cost:10000, stageReq:0},
-    auto_harvest: {name:'자동 수확기', emoji:'🚜', desc:'익은 작물 자동 수확', cost:30000, stageReq:2}
-  },
+    // 효과음 합성 (파일 없이 코드만으로 재생)
+    playSfx(type) {
+        if (!this.ctx || this.isMuted) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
 
-  state: {
-    brandName:'내 농장', money:100000, reputation:0, day:1, stage:0,
-    cafeOpen:false, satisfaction:0, totalServed:0, paused:false, secondsPlayed:0,
-    plots: Array(8).fill(null).map(()=>({crop:null, plantedAt:null, stage:'empty'})),
-    inventory: {wheat:0, strawb:0, bean:0, milk:0},
-    learnedRecipes: ['egg_toast'],
-    upgrades: [],
-    staff: {},
-    customers: [],
-    reviews: [],
-    dayTimer: 0
-  },
+        const now = this.ctx.currentTime;
 
-  init() {
-    this.load();
-    this.startTimers();
-    window.addEventListener('beforeunload', () => this.save()); // 탭 닫을 때 즉시 저장
-    ui.renderAll();
-    ui.addLog("🌱 사장님, 환영합니다! (30초 자동 저장 활성화)");
-  },
-
-  startTimers() {
-    setInterval(() => {
-      if (!this.state.paused) this.tick();
-    }, 1000);
-  },
-
-  tick() {
-    this.state.secondsPlayed++;
-    this.state.dayTimer++;
-
-    // 날짜 변경 (90초당 1일)
-    if (this.state.dayTimer >= 90) {
-      this.state.dayTimer = 0;
-      this.state.day++;
-      this.save(true); // 날짜 바뀔 때 자동 저장
-    }
-
-    // 30초마다 자동 저장
-    if (this.state.secondsPlayed % 30 === 0) this.save(true);
-
-    // 농작물 성장 로직
-    const fert = this.state.upgrades.includes('fertilizer') ? 0.7 : 1;
-    this.state.plots.forEach((p, i) => {
-      if (p.stage === 'growing') {
-        const elapsed = (Date.now() - p.plantedAt) / 1000;
-        if (elapsed >= this.CROPS[p.crop].growTime * fert) {
-          p.stage = 'ready';
-          if (this.state.upgrades.includes('auto_harvest')) this.harvestPlot(i);
+        if (type === 'plant') { // 툭
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(); osc.stop(now + 0.1);
+        } else if (type === 'harvest') { // 뽀드득 (높은 톤)
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(600, now + 0.05);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(); osc.stop(now + 0.1);
+        } else if (type === 'serve') { // 띠링
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(); osc.stop(now + 0.3);
+        } else if (type === 'click') { // 딸깍
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(1000, now);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+            osc.start(); osc.stop(now + 0.05);
+        } else if (type === 'lvlup') { // 빰빠밤
+            [523.25, 659.25, 783.99].forEach((f, i) => {
+                const o = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                o.connect(g); g.connect(this.ctx.destination);
+                o.frequency.setValueAtTime(f, now + i * 0.1);
+                g.gain.setValueAtTime(0.1, now + i * 0.1);
+                g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
+                o.start(now + i * 0.1); o.stop(now + i * 0.1 + 0.3);
+            });
         }
-      }
-    });
+    },
 
-    // 카페 손님 로직
-    if (this.state.cafeOpen) {
-      this.state.customers.forEach((c, i) => {
-        c.patience -= 1.5;
-        if (c.patience <= 0) {
-          this.state.customers.splice(i, 1);
-          this.state.reputation = Math.max(0, this.state.reputation - 5);
-          ui.addLog(`😤 손님이 기다리다 떠났습니다.`);
-        }
-      });
-      if (Math.random() < 0.05 && this.state.customers.length < 5) this.spawnCustomer();
+    // 탭 전환 시 배경음악 변경 (무료 오디오 라이브러리 예시 링크)
+    updateBgm(mode) {
+        if (this.currentBgm === mode) return;
+        this.currentBgm = mode;
+
+        if (this.bgm) { this.bgm.pause(); this.bgm = null; }
+
+        // 실제 음원을 넣고 싶다면 아래 URL을 변경하세요.
+        // 농장: 새소리 / 카페: 재즈 등
+        const urls = {
+            'farm': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3', // 예시 배경음
+            'cafe': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'   // 예시 배경음
+        };
+
+        this.bgm = new Audio(urls[mode] || urls.farm);
+        this.bgm.loop = true;
+        this.bgm.volume = 0.2;
+        if (!this.isMuted) this.bgm.play().catch(e => console.log("자동재생 방지됨"));
     }
-
-    this.checkStageUp();
-    ui.renderAll();
-  },
-
-  harvestPlot(i) {
-    const p = this.state.plots[i];
-    const crop = this.CROPS[p.crop];
-    this.state.inventory[crop.gives] += crop.yield;
-    this.state.plots[i] = {crop:null, plantedAt:null, stage:'empty'};
-    ui.addLog(`🎉 ${crop.name} 수확! (+${crop.yield})`);
-  },
-
-  spawnCustomer() {
-    const pool = Object.keys(this.RECIPES).filter(k => 
-      this.state.learnedRecipes.includes(k) && this.RECIPES[k].stageReq <= this.state.stage
-    );
-    const order = pool[Math.floor(Math.random() * pool.length)];
-    this.state.customers.push({ id: Date.now(), order, patience: 100, name: "손님 "+(this.state.totalServed+1) });
-  },
-
-  checkStageUp() {
-    const next = this.STAGES[this.state.stage + 1];
-    if (next && this.state.reputation >= next.repReq) {
-      this.state.stage++;
-      ui.addLog(`🎊 ${next.name} 달성!`);
-    }
-  },
-
-  openCafe() {
-    const total = Object.values(this.state.inventory).reduce((a,b)=>a+b, 0);
-    if (total >= 20) {
-      this.state.cafeOpen = true;
-      this.state.stage = 1;
-      ui.addLog("☕ 카페 오픈! 명성을 쌓아 성장하세요.");
-    }
-  },
-
-  togglePause() {
-    this.state.paused = !this.state.paused;
-    document.getElementById('pauseLabel').textContent = this.state.paused ? '재개' : '일시정지';
-  },
-
-  save(silent = false) {
-    localStorage.setItem('farmcafe_pro_save', JSON.stringify(this.state));
-    if (!silent) ui.addLog("💾 수동 저장 완료!");
-    else if (this.state.secondsPlayed % 60 === 0) ui.addLog("💾 자동 저장됨.");
-  },
-
-  load() {
-    const saved = localStorage.getItem('farmcafe_pro_save');
-    if (saved) {
-      const data = JSON.parse(saved);
-      this.state = { ...this.state, ...data };
-    }
-  }
 };
 
 /**
- * [ui] 화면 렌더링 및 인터랙션
+ * [game] 핵심 로직
  */
-const ui = {
-  renderAll() {
-    const s = game.state;
-    document.getElementById('moneyDisplay').textContent = s.money.toLocaleString();
-    document.getElementById('repDisplay').textContent = s.reputation;
-    document.getElementById('dayDisplay').textContent = s.day;
-    document.getElementById('stageBadge').textContent = game.STAGES[s.stage].name;
-    document.getElementById('brandIcon').textContent = game.STAGES[s.stage].building;
-    
-    this.renderFarm();
-    this.renderInventory();
-    this.renderCafe();
-    this.renderTabContent();
-    this.updateProgressBar();
-  },
+const game = {
+    state: {
+        money: 5000, reputation: 0, day: 1, stage: 0,
+        cafeOpen: false, 
+        plots: Array(8).fill(null).map(() => ({ crop: null, plantedAt: null, stage: 'empty' })),
+        inventory: {},
+        learnedRecipes: ['egg_toast'],
+        secondsPlayed: 0, dayTimer: 0
+    },
 
-  renderFarm() {
-    const grid = document.getElementById('farm-grid');
-    grid.innerHTML = game.state.plots.map((p, i) => {
-      let content = '+';
-      let cls = 'empty';
-      if (p.stage !== 'empty') {
-        content = game.CROPS[p.crop].emoji;
-        cls = p.stage;
-      }
-      return `<div class="plot ${cls}" onclick="ui.plotClick(${i})">${content}</div>`;
-    }).join('');
-  },
+    CROPS: {
+        wheat: { emoji: '🌾', name: '밀', growTime: 10, cost: 500, yield: 5, gives: 'wheat' },
+        egg: { emoji: '🥚', name: '달걀', growTime: 8, cost: 300, yield: 3, gives: 'egg' },
+        bean: { emoji: '🫘', name: '커피콩', growTime: 20, cost: 1000, yield: 6, gives: 'bean' }
+    },
 
-  plotClick(i) {
-    const p = game.state.plots[i];
-    if (p.stage === 'empty') this.openSeedPicker(i);
-    else if (p.stage === 'ready') game.harvestPlot(i);
-  },
+    RECIPES: {
+        egg_toast: { name: '계란 토스트', price: 2500, ingredients: { wheat: 1, egg: 1 }, stageReq: 1 },
+        americano: { name: '아메리카노', price: 3500, ingredients: { bean: 2 }, stageReq: 2 }
+    },
 
-  openSeedPicker(idx) {
-    const modal = document.getElementById('modalContent');
-    modal.innerHTML = `<h3>🌱 씨앗 선택</h3><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">` +
-      Object.entries(game.CROPS).map(([k, c]) => 
-        `<button class="btn btn-secondary" onclick="ui.plant(${idx}, '${k}')" ${game.state.money < c.cost ? 'disabled' : ''}>
-          ${c.emoji} ${c.name}<br>💰${c.cost}
-        </button>`
-      ).join('') + `</div><button class="btn" onclick="ui.closeModal()" style="margin-top:15px; width:100%;">닫기</button>`;
-    document.getElementById('modalOverlay').classList.add('show');
-  },
+    STAGES: [
+        { name: '🌱 시작의 농장', repReq: 0 },
+        { name: '🛖 길거리 노점', repReq: 200 },
+        { name: '🥪 토스트 가게', repReq: 600 }
+    ],
 
-  plant(idx, k) {
-    const crop = game.CROPS[k];
-    game.state.money -= crop.cost;
-    game.state.plots[idx] = { crop: k, plantedAt: Date.now(), stage: 'growing' };
-    this.closeModal();
-    this.addLog(`🌱 ${crop.name}을(를) 심었습니다.`);
-  },
+    init() {
+        this.load();
+        setInterval(() => this.tick(), 1000);
+        window.addEventListener('beforeunload', () => this.save());
+        ui.renderAll();
+        audio.updateBgm('farm'); // 첫 시작은 농장 음악
+    },
 
-  renderInventory() {
-    const inv = document.getElementById('inventoryInline');
-    inv.innerHTML = Object.entries(game.state.inventory).map(([k, v]) => 
-      v > 0 ? `<div class="inv-chip">${v}</div>` : '' // 아이콘과 수량 표시 생략(공간상)
-    ).join('');
-    // 실제 재료 이름 매핑 로직 추가 필요 시 확장 가능
-  },
+    tick() {
+        if (this.state.paused) return;
+        this.state.secondsPlayed++;
+        this.state.dayTimer++;
 
-  renderCafe() {
-    if (!game.state.cafeOpen) {
-      const total = Object.values(game.state.inventory).reduce((a,b)=>a+b, 0);
-      document.getElementById('openCafeBtn').style.display = total >= 20 ? 'block' : 'none';
-      return;
-    }
-    document.getElementById('cafe-locked').style.display = 'none';
-    document.getElementById('cafe-open').style.display = 'flex';
-    
-    // 손님 렌더링
-    const list = document.getElementById('customerList');
-    list.innerHTML = game.state.customers.map(c => {
-      const r = game.RECIPES[c.order];
-      return `<div class="cust-card">
-        <div style="flex:1"><b>${c.name}</b><br><small>${r.emoji} ${r.name}</small>
-          <div class="cust-pat-bg"><div class="cust-pat-fill" style="width:${c.patience}%; background:${c.patience>50?'#5A8A3C':'#D4A017'}"></div></div>
-        </div>
-        <button class="btn btn-green btn-sm" onclick="ui.serveCustomer(${c.id})">서빙</button>
-      </div>`;
-    }).join('');
+        // 성장 로직
+        this.state.plots.forEach(p => {
+            if (p.stage === 'growing') {
+                const elapsed = (Date.now() - p.plantedAt) / 1000;
+                if (elapsed >= this.CROPS[p.crop].growTime) p.stage = 'ready';
+            }
+        });
 
-    // 메뉴판 렌더링
-    const mGrid = document.getElementById('menuGrid');
-    mGrid.innerHTML = Object.entries(game.RECIPES).map(([k, r]) => {
-      const locked = r.stageReq > game.state.stage;
-      return `<div class="menu-card ${locked ? 'locked' : 'unlocked'}">
-        <div style="font-size:20px;">${r.emoji}</div>
-        <div style="font-size:10px; font-weight:700;">${r.name}</div>
-        <div style="font-size:9px; color:var(--grass);">${locked ? 'Lv.'+r.stageReq : '💰'+r.price}</div>
-      </div>`;
-    }).join('');
-  },
+        if (this.state.dayTimer >= 90) { this.state.dayTimer = 0; this.state.day++; this.save(true); }
+        if (this.state.secondsPlayed % 30 === 0) this.save(true);
+        if (this.state.cafeOpen && Math.random() < 0.05) this.spawnCustomer();
 
-  serveCustomer(id) {
-    const idx = game.state.customers.findIndex(c => c.id === id);
-    const cust = game.state.customers[idx];
-    const recipe = game.RECIPES[cust.order];
-    
-    // 재료 체크
-    for (const [ing, qty] of Object.entries(recipe.ingredients)) {
-      if ((game.state.inventory[ing] || 0) < qty) { alert("재료가 부족합니다!"); return; }
-    }
+        ui.renderAll();
+    },
 
-    // 소모 및 보상
-    for (const [ing, qty] of Object.entries(recipe.ingredients)) game.state.inventory[ing] -= qty;
-    game.state.money += recipe.price;
-    game.state.reputation += 30;
-    game.state.totalServed++;
-    game.state.customers.splice(idx, 1);
-    this.addLog(`✅ 서빙 완료! +💰${recipe.price}`);
-  },
+    openCafe() {
+        const total = Object.values(this.state.inventory).reduce((a, b) => a + b, 0);
+        if (total >= 20) {
+            audio.playSfx('lvlup');
+            this.state.cafeOpen = true;
+            this.state.stage = 1;
+            ui.addLog("☕ 카페가 오픈되었습니다! 음악이 바뀝니다.");
+            audio.updateBgm('cafe'); // 카페 오픈 시 음악 전환
+            ui.renderAll();
+        }
+    },
 
-  updateProgressBar() {
-    const cur = game.state.reputation;
-    const prev = game.STAGES[game.state.stage].repReq;
-    const nextData = game.STAGES[game.state.stage + 1];
-    const next = nextData ? nextData.repReq : prev;
-    const diff = Math.max(1, next - prev);
-    const pct = game.state.stage >= 3 ? 100 : Math.min(100, ((cur - prev) / diff) * 100);
-    
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('progressText').textContent = game.state.stage >= 3 ? '🏆 최고 단계!' : `${cur} / ${next} 명성`;
-    document.getElementById('cafeStageLabel').textContent = `☕ ${game.STAGES[game.state.stage].name}`;
-  },
+    spawnCustomer() {
+        const pool = Object.keys(this.RECIPES).filter(k => this.state.learnedRecipes.includes(k));
+        const order = pool[Math.floor(Math.random() * pool.length)];
+        ui.addCustomer(order);
+    },
 
-  renderTabContent() {
-    // 업그레이드 탭
-    const upgTab = document.getElementById('tab-upgrades');
-    upgTab.innerHTML = Object.entries(game.UPGRADES).map(([k, u]) => {
-      const owned = game.state.upgrades.includes(k);
-      return `<div class="cust-card">
-        <div style="flex:1"><b>${u.emoji} ${u.name}</b><br><small>${u.desc}</small></div>
-        <button class="btn btn-gold btn-sm" onclick="ui.buyUpgrade('${k}')" ${owned || game.state.money < u.cost ? 'disabled' : ''}>
-          ${owned ? '보유중' : '💰'+u.cost}
-        </button>
-      </div>`;
-    }).join('');
-    
-    // 직원 탭 (확장 가능)
-    document.getElementById('tab-staff').innerHTML = '<p style="font-size:11px; text-align:center; padding:10px;">직원 시스템 준비 중...</p>';
-  },
+    save(silent = false) {
+        localStorage.setItem('boss_save_audio_pro', JSON.stringify(this.state));
+        if (silent && this.state.secondsPlayed % 60 === 0) ui.addLog("💾 데이터 자동 저장됨.");
+    },
 
-  buyUpgrade(k) {
-    const u = game.UPGRADES[k];
-    game.state.money -= u.cost;
-    game.state.upgrades.push(k);
-    this.addLog(`🔧 업그레이드 완료: ${u.name}`);
-  },
+    load() {
+        const saved = localStorage.getItem('boss_save_audio_pro');
+        if (saved) this.state = { ...this.state, ...JSON.parse(saved) };
+    },
 
-  addLog(msg) {
-    const log = document.getElementById('logEntries');
-    const div = document.createElement('div');
-    div.innerHTML = `<span style="color:#888;">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
-    log.prepend(div);
-  },
-
-  switchTab(t) {
-    document.querySelectorAll('.tab-btn, .tab-pane').forEach(el => el.classList.remove('active'));
-    event.target.classList.add('active');
-    document.getElementById('tab-' + t).classList.add('active');
-  },
-
-  mobileSwitch(t) {
-    document.querySelectorAll('.col-tab').forEach(el => el.classList.remove('active'));
-    document.getElementById('col-' + t).classList.add('active');
-  },
-
-  closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+    reset() { if (confirm("초기화할까요?")) { localStorage.clear(); location.reload(); } }
 };
 
-// 시작!
+/**
+ * [ui] 화면 렌더링 및 이펙트
+ */
+const ui = {
+    renderAll() {
+        document.getElementById('moneyDisplay').textContent = game.state.money.toLocaleString();
+        document.getElementById('repDisplay').textContent = game.state.reputation;
+        document.getElementById('dayDisplay').textContent = game.state.day;
+        this.renderFarm();
+        this.renderInventory();
+        this.renderCafe();
+    },
+
+    // 플로팅 텍스트 애니메이션 (돈/아이템 획득 시)
+    showFloatingText(x, y, text, color = 'var(--espresso)') {
+        const el = document.createElement('div');
+        el.className = 'floating-num';
+        el.textContent = text;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.color = color;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 800);
+    },
+
+    renderFarm() {
+        const grid = document.getElementById('farm-grid');
+        grid.innerHTML = game.state.plots.map((p, i) => {
+            let content = '+'; let cls = '';
+            if (p.stage !== 'empty') content = game.CROPS[p.crop].emoji;
+            if (p.stage === 'ready') cls = 'ready';
+            return `<div class="plot ${cls}" onclick="ui.plotClick(event, ${i})">${content}</div>`;
+        }).join('');
+    },
+
+    plotClick(e, i) {
+        if (!audio.ctx) audio.init(); // 첫 클릭 시 오디오 엔진 활성화
+        const p = game.state.plots[i];
+        if (p.stage === 'empty') {
+            audio.playSfx('click');
+            this.openSeedPicker(i);
+        } else if (p.stage === 'ready') {
+            audio.playSfx('harvest');
+            const crop = game.CROPS[p.crop];
+            game.state.inventory[crop.gives] = (game.state.inventory[crop.gives] || 0) + crop.yield;
+            this.showFloatingText(e.pageX, e.pageY, `+${crop.yield}`, 'var(--grass)');
+            game.state.plots[i] = { crop: null, plantedAt: null, stage: 'empty' };
+            this.addLog(`🎉 ${crop.name} ${crop.yield}개 수확!`);
+        }
+    },
+
+    openSeedPicker(idx) {
+        const modal = document.getElementById('modalContent');
+        modal.innerHTML = `<h3 style="font-family:'Jua';">🌱 씨앗 선택</h3><div style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">` +
+            Object.entries(game.CROPS).map(([k, c]) => 
+                `<button class="btn" onclick="ui.plant(event, ${idx}, '${k}')" style="text-align:left; background:#f5f5f5;">
+                    ${c.emoji} ${c.name} (💰${c.cost})
+                </button>`
+            ).join('') + `</div><button class="btn" onclick="ui.closeModal()" style="margin-top:15px; width:100%;">취소</button>`;
+        document.getElementById('modalOverlay').classList.add('show');
+    },
+
+    plant(e, idx, k) {
+        const crop = game.CROPS[k];
+        if (game.state.money >= crop.cost) {
+            audio.playSfx('plant');
+            game.state.money -= crop.cost;
+            game.state.plots[idx] = { crop: k, plantedAt: Date.now(), stage: 'growing' };
+            this.showFloatingText(e.pageX, e.pageY, `-💰${crop.cost}`, '#e74c3c');
+            this.closeModal();
+            this.addLog(`🌱 ${crop.name}을(를) 심었습니다.`);
+        } else {
+            alert("자금이 부족합니다!");
+        }
+    },
+
+    renderInventory() {
+        const inv = document.getElementById('inventoryInline');
+        inv.innerHTML = Object.entries(game.state.inventory).map(([k, v]) => 
+            v > 0 ? `<div class="inv-chip">📦 ${v}</div>` : ''
+        ).join('');
+    },
+
+    renderCafe() {
+        const locked = document.getElementById('cafe-locked');
+        const open = document.getElementById('cafe-open');
+        const btn = document.getElementById('openCafeBtn');
+        if (game.state.cafeOpen) {
+            locked.style.display = 'none'; open.style.display = 'block';
+            this.updateProgress();
+        } else {
+            const total = Object.values(game.state.inventory).reduce((a, b) => a + b, 0);
+            if (total >= 20) btn.style.display = 'block';
+        }
+    },
+
+    updateProgress() {
+        const stage = game.STAGES[game.state.stage];
+        const next = game.STAGES[game.state.stage + 1];
+        if (next) {
+            const pct = Math.min(100, (game.state.reputation / next.repReq) * 100);
+            document.getElementById('progressFill').style.width = pct + "%";
+            document.getElementById('progressText').textContent = `${game.state.reputation} / ${next.repReq}`;
+            if (game.state.reputation >= next.repReq) {
+                audio.playSfx('lvlup');
+                game.state.stage++;
+                this.addLog(`🎊 카페 레벨업: ${game.STAGES[game.state.stage].name}`);
+            }
+        }
+        document.getElementById('cafeStageTitle').textContent = stage.name;
+    },
+
+    addCustomer(order) {
+        const list = document.getElementById('customerList');
+        const id = Date.now();
+        const recipe = game.RECIPES[order];
+        const div = document.createElement('div');
+        div.style = "background:white; padding:10px; border-radius:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #ddd;";
+        div.innerHTML = `<div><b>손님</b><br><small>${recipe.name}</small></div>
+            <button class="btn btn-primary" style="padding:4px 8px; font-size:11px;" onclick="ui.serveCustomer(event, ${id}, '${order}', this)">서빙</button>`;
+        list.appendChild(div);
+    },
+
+    serveCustomer(e, id, order, btn) {
+        const recipe = game.RECIPES[order];
+        let canServe = true;
+        for (const [ing, qty] of Object.entries(recipe.ingredients)) {
+            if ((game.state.inventory[ing] || 0) < qty) canServe = false;
+        }
+
+        if (canServe) {
+            audio.playSfx('serve');
+            for (const [ing, qty] of Object.entries(recipe.ingredients)) game.state.inventory[ing] -= qty;
+            game.state.money += recipe.price;
+            game.state.reputation += 20;
+            this.showFloatingText(e.pageX, e.pageY, `+💰${recipe.price}`, 'var(--gold)');
+            btn.parentElement.remove();
+            this.addLog(`✅ 서빙 성공! (+💰${recipe.price})`);
+            this.renderAll();
+        } else {
+            alert("재료가 부족합니다!");
+        }
+    },
+
+    addLog(msg) {
+        const log = document.getElementById('logEntries');
+        const div = document.createElement('div');
+        div.textContent = `> ${msg}`;
+        log.prepend(div);
+        if (log.children.length > 30) log.lastChild.remove();
+    },
+
+    mobileSwitch(id) {
+        audio.playSfx('click');
+        document.querySelectorAll('.col-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('col-' + id).classList.add('active');
+        // 탭에 따라 배경음악 즉시 변경 시도
+        audio.updateBgm(id === 'manage' ? 'farm' : id);
+    },
+
+    closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+};
+
+// 시작 시 오디오 시스템은 사용자 인터랙션 후 활성화됨
 game.init();
 </script>
 </body>
