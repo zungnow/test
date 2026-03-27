@@ -1086,6 +1086,13 @@ function harvestPlot(idx) {
   G.plots[idx]={crop:null,plantedAt:null,growTime:null,stage:'empty'};
   addLog(`🎉 ${crop.emoji} ${crop.name} ${crop.yield}개 수확!`);
   checkCafeEligibility(); renderFarm(); renderInventory();
+  // [추가] 수확 효과음과 플로팅 텍스트
+  audio.playSfx('harvest'); 
+  const e = window.event;
+  if(e) showFloating(e.pageX, e.pageY, `+${crop.yield}`, 'var(--grass)');
+
+  G.inventory[crop.gives]=(G.inventory[crop.gives]||0)+crop.yield;
+  // ... (기존 로직 계속)
 }
 
 function openPlantModal(idx) {
@@ -1142,6 +1149,13 @@ function plantCrop(idx, cropKey) {
   closeModal('plantModal');
   addLog(`🌱 ${crop.emoji} ${crop.name} 심기! (${crop.growTime}초 후 수확)`);
   renderFarm(); updateHeader();
+  // [추가] 심기 효과음과 돈 차감 표시
+  audio.playSfx('plant');
+  const e = window.event;
+  if(e) showFloating(e.pageX, e.pageY, `-💰${crop.cost}`, '#e74c3c');
+
+  G.money-=crop.cost;
+  // ... (기존 로직 계속)
 }
 
 // ══════════════════════════════════════════
@@ -1388,6 +1402,14 @@ function serveCustomer(custId, isAuto, staffName) {
   const who=isAuto?`[${staffName}] `:'';
   addLog(`✅ ${who}${cust.name}님 서빙! +${price}원`);
   renderInventory(); renderReviews(); updateHeader(); updateSatisfaction(); updateProgressBar();
+
+  // [추가] 서빙 완료 효과음과 수익 표시
+  audio.playSfx('serve');
+  const e = window.event;
+  if(e && !isAuto) showFloating(e.pageX, e.pageY, `+💰${price}`, 'var(--gold)');
+
+  G.money+=price;
+  // ... (기존 로직 계속)
 }
 
 // ══════════════════════════════════════════
