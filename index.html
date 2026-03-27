@@ -1583,31 +1583,37 @@ function serveCustomer(custId, isAuto, staffName) {
   G.customers.splice(idx,1);
   // 플로팅 텍스트 + 사운드 — 카드 제거 전에 위치 저장
   const custEl=document.querySelector(`[data-cid="${custId}"]`);
-  // 메인/관리탭 여부: 카페탭 손님카드가 보이는 상태인지 확인
   const custRect = custEl ? custEl.getBoundingClientRect() : null;
   const custVisible = custRect && custRect.width > 0 && custRect.top > 0 && custRect.top < window.innerHeight;
+
+  // 표시 기준 좌표 결정 (카페탭: 카드 위치 / 메인·관리탭: mob-cust-list 패널)
+  let floatX, floatY;
   if (custVisible) {
-    // 카페탭: 카드 위치 기준
-    floatText(`+💰${price.toLocaleString()}`, custRect.left + custRect.width/2 - 20, custRect.top + custRect.height/2, '#D4A017');
+    floatX = custRect.left + custRect.width/2 - 20;
+    floatY = custRect.top  + custRect.height/2;
   } else {
-    // 메인/관리탭: mob-cust-list 패널 위치 기준
     const listEl = document.getElementById('mob-cust-list') || document.getElementById('mob-cust-list-manage');
     const listRect = listEl ? listEl.getBoundingClientRect() : null;
     if (listRect && listRect.width > 0 && listRect.top > 0 && listRect.top < window.innerHeight) {
-      floatText(`+💰${price.toLocaleString()}`, listRect.left + listRect.width/2 - 20, listRect.top + 20, '#D4A017');
+      floatX = listRect.left + listRect.width/2 - 20;
+      floatY = listRect.top  + 20;
     } else {
-      floatText(`+💰${price.toLocaleString()}`, window.innerWidth/2 - 40, window.innerHeight * 0.4, '#D4A017');
+      floatX = window.innerWidth/2 - 40;
+      floatY = window.innerHeight * 0.4;
     }
   }
+
+  // 가격 텍스트 (모든 탭 동일)
+  floatText(`+💰${price.toLocaleString()}`, floatX, floatY, '#D4A017');
+
   audio.init(); audio.playSfx('serve'); audio.playSfx('money');
-  // 서빙 성공 음식 이모지 팡! 연출
-  if (custRect && custRect.width > 0) {
-    const foodEl = document.createElement('div');
-    foodEl.style.cssText = `position:fixed;left:${custRect.left+custRect.width/2-20}px;top:${custRect.top+10}px;font-size:28px;z-index:500;pointer-events:none;animation:foodPop 0.7s cubic-bezier(.34,1.56,.64,1) forwards;`;
-    foodEl.textContent = recipe.emoji;
-    document.body.appendChild(foodEl);
-    setTimeout(()=>foodEl.remove(), 750);
-  }
+
+  // 음식 이모지 팡! 연출 (모든 탭 동일)
+  const foodEl = document.createElement('div');
+  foodEl.style.cssText = `position:fixed;left:${floatX}px;top:${floatY - 20}px;font-size:28px;z-index:500;pointer-events:none;animation:foodPop 0.7s cubic-bezier(.34,1.56,.64,1) forwards;`;
+  foodEl.textContent = recipe.emoji;
+  document.body.appendChild(foodEl);
+  setTimeout(()=>foodEl.remove(), 750);
   custEl?.remove();
   if (G.customers.length===0) showCustEmpty();
   document.getElementById('custCount').textContent=`(${G.customers.length}명)`;
