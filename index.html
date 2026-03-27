@@ -834,15 +834,23 @@ let tickTimer=null, spawnTimer=null, staffTimer=null;
 //  BOOT
 // ══════════════════════════════════════════
 window.onload = () => {
-  if (localStorage.getItem('farmcafe_v3')) {
-    const el=document.createElement('div'); el.className='modal-overlay show';
-    el.innerHTML=`<div class="modal"><div class="modal-title">🌱 저장된 게임 발견!</div>
-      <div class="modal-body" style="text-align:center;color:var(--latte);font-size:13px;">이전 게임을 이어할까요?</div>
-      <div class="modal-btns" style="flex-direction:column;gap:8px;">
-        <button class="btn btn-primary" onclick="loadGame();this.closest('.modal-overlay').remove()">💾 이어하기</button>
-        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove();showModal('nameModal')">🆕 새 게임</button>
-      </div></div>`;
-    document.body.appendChild(el);
+  const raw = localStorage.getItem('farmcafe_v3');
+  if (raw) {
+    let valid = false;
+    try { const d = JSON.parse(raw); if (d && d.day) valid = true; } catch(e) {}
+    if (valid) {
+      const el=document.createElement('div'); el.className='modal-overlay show';
+      el.innerHTML=`<div class="modal"><div class="modal-title">🌱 저장된 게임 발견!</div>
+        <div class="modal-body" style="text-align:center;color:var(--latte);font-size:13px;">이전 게임을 이어할까요?</div>
+        <div class="modal-btns" style="flex-direction:column;gap:8px;">
+          <button class="btn btn-primary" onclick="loadGame();this.closest('.modal-overlay').remove()">💾 이어하기</button>
+          <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove();showModal('nameModal')">🆕 새 게임</button>
+        </div></div>`;
+      document.body.appendChild(el);
+    } else {
+      localStorage.removeItem('farmcafe_v3');
+      showModal('nameModal');
+    }
   } else showModal('nameModal');
 };
 
@@ -1934,24 +1942,78 @@ const seasonHints = {
 //  SAVE / LOAD
 // ══════════════════════════════════════════
 function saveToStorage() {
-  const data={...G, triggeredEvents:[...G.triggeredEvents], savedAt:new Date().toLocaleString()};
-  localStorage.setItem('farmcafe_v3',JSON.stringify(data));
-  updateSaveStatus(true);
+  // contest 내부의 타이머 참조 등 직렬화 불가 필드 제거
+  let safeContest = null;
+  if (G.contest) {
+    const { _judgeSpawnTimer, _judgeQueue, ...rest } = G.contest;
+    safeContest = rest;
+  }
+  // quests: getter 함수를 일반 문자열로 고정
+  const safeQuests = (G.quests||[]).map(q => ({
+    type: q.type,
+    target: q.target||null,
+    goal: q.goal,
+    current: q.current,
+    done: q.done,
+    desc: q.desc,          // getter 결과를 string으로 저장
+    reward: q.reward,
+    rewardDesc: q.rewardDesc,
+  }));
+  const data = {
+    ...G,
+    triggeredEvents: [...G.triggeredEvents],
+    contest: safeContest,
+    quests: safeQuests,
+    savedAt: new Date().toLocaleString(),
+  };
+  try {
+    localStorage.setItem('farmcafe_v3', JSON.stringify(data));
+    updateSaveStatus(true);
+  } catch(e) {
+    // 저장 실패 시 contest 제외하고 재시도
+    data.contest = null;
+    try { localStorage.setItem('farmcafe_v3', JSON.stringify(data)); updateSaveStatus(true); } catch(e2) {}
+  }
 }
 function saveGame() { saveToStorage(); showNotif('💾 저장 완료!'); closeModal('saveModal'); }
 
 function loadGame() {
-  const raw=localStorage.getItem('farmcafe_v3'); if (!raw) return;
-  const d=JSON.parse(raw); Object.assign(G,d);
-  G.triggeredEvents=new Set(d.triggeredEvents||[]);
-  if (!G.staff) G.staff={};
-  closeModal('saveModal'); boot();
-  addLog(`💾 불러오기 완료! (${d.savedAt})`);
-  // 저장 시간 복원
-  if (d.savedAt) {
-    G._lastSavedTime = Date.now();
-    updateSaveStatus(true);
+  const raw = localStorage.getItem('farmcafe_v3');
+  if (!raw) return;
+  let d;
+  try { d = JSON.parse(raw); } catch(e) { showNotif('❌ 저장 데이터가 손상됐어요. 새 게임을 시작해주세요.'); return; }
+
+  // 기본 필드 덮어쓰기
+  Object.assign(G, d);
+
+  // 직렬화 복원
+  G.triggeredEvents = new Set(Array.isArray(d.triggeredEvents) ? d.triggeredEvents : []);
+  G.triggeredContests = Array.isArray(d.triggeredContests) ? d.triggeredContests : [];
+  G.contestHistory    = Array.isArray(d.contestHistory)    ? d.contestHistory    : [];
+  G.quests            = Array.isArray(d.quests)            ? d.quests            : [];
+  G.achievements      = Array.isArray(d.achievements)      ? d.achievements      : [];
+
+  // contest 내 타이머 필드 초기화
+  if (G.contest) {
+    G.contest._judgeSpawnTimer = null;
+    G.contest._judgeQueue      = G.contest._judgeQueue || [];
   }
+
+  // 필수 객체 안전 초기화
+  if (!G.staff)          G.staff          = {};
+  if (!G.boosters)       G.boosters       = {};
+  if (!G.staffLevels)    G.staffLevels    = {};
+  if (!G.encyclopedia)   G.encyclopedia   = {};
+  if (!G.harvestedCrops) G.harvestedCrops = {};
+  if (!G.regulars)       G.regulars       = {};
+  if (!G.inventory)      G.inventory      = {};
+  if (!G.menuSoldCount)  G.menuSoldCount  = {};
+  if (!G.plots || !Array.isArray(G.plots)) G.plots = Array(8).fill(null).map(()=>({crop:null,plantedAt:null,growTime:null,stage:'empty'}));
+
+  closeModal('saveModal');
+  boot();
+  addLog(`💾 불러오기 완료! (${d.savedAt||''})`);
+  if (d.savedAt) { G._lastSavedTime = Date.now(); updateSaveStatus(true); }
 }
 function exportSave() {
   const d={...G,triggeredEvents:[...G.triggeredEvents],savedAt:new Date().toLocaleString()};
@@ -1962,7 +2024,17 @@ function importSave() {
   const inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
   inp.onchange=e=>{
     const r=new FileReader(); r.onload=ev=>{
-      try { const d=JSON.parse(ev.target.result); Object.assign(G,d); G.triggeredEvents=new Set(d.triggeredEvents||[]); if(!G.staff)G.staff={}; boot(); showNotif('✅ 완료!'); closeModal('saveModal'); }
+      try {
+        const d=JSON.parse(ev.target.result);
+        Object.assign(G,d);
+        G.triggeredEvents=new Set(Array.isArray(d.triggeredEvents)?d.triggeredEvents:[]);
+        G.triggeredContests=Array.isArray(d.triggeredContests)?d.triggeredContests:[];
+        G.contestHistory=Array.isArray(d.contestHistory)?d.contestHistory:[];
+        G.quests=Array.isArray(d.quests)?d.quests:[];
+        if(!G.staff)G.staff={};
+        if(G.contest){G.contest._judgeSpawnTimer=null;G.contest._judgeQueue=G.contest._judgeQueue||[];}
+        boot(); showNotif('✅ 완료!'); closeModal('saveModal');
+      }
       catch { showNotif('❌ 파일 오류'); }
     }; r.readAsText(e.target.files[0]);
   }; inp.click();
@@ -2548,8 +2620,8 @@ function activateBooster(key) {
     showNotif(`⛔ 오늘 이 부스터는 더 이상 사용할 수 없어요! (${h}시간 ${m}분 후 초기화)`);
     return;
   }
-  const costs = {bean:30000, ads:20000, popup:15000, lucky:10000, staffB:25000};
-  const cost = costs[key];
+  const costs = {bean:30000, ads:20000, popup:15000, lucky:2000, staffB:25000};
+  const cost = costs[key] ?? 0;
   if (G.money < cost) { showNotif('💰 돈이 부족해요!'); return; }
   G.money -= cost;
   saveBoosterLog(key, getBoosterLog(key) + 1);
