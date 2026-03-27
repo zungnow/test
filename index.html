@@ -905,7 +905,9 @@ function boot() {
   }
   applySeasonBg();
   renderAll();
-  if (!tickTimer) startTimers();
+  // 타이머 항상 새로 시작 (중복 방지: 기존 타이머 정리 후 재시작)
+  clearInterval(tickTimer); tickTimer = null;
+  startTimers();
   addLog(`🌱 ${G.brandName}의 이야기가 시작됩니다!`);
   renderAutoHarvestBtn();
 }
@@ -1812,7 +1814,9 @@ function updateAllBanners() {
   }
   updateMobEventBanners();
   if (typeof updateContestBanner === 'function') updateContestBanner();
-} {
+}
+
+function updateMobEventBanners() {
   ['mob-event-banner-farm','mob-event-banner-manage'].forEach(id=>{
     const el=document.getElementById(id); if (!el) return;
     el.innerHTML='';
@@ -1948,78 +1952,122 @@ const seasonHints = {
 //  SAVE / LOAD
 // ══════════════════════════════════════════
 function saveToStorage() {
-  // contest 내부의 타이머 참조 등 직렬화 불가 필드 제거
+  // 직렬화 불가 필드 안전 처리
   let safeContest = null;
   if (G.contest) {
     const { _judgeSpawnTimer, _judgeQueue, ...rest } = G.contest;
     safeContest = rest;
   }
-  // quests: getter 함수를 일반 문자열로 고정
   const safeQuests = (G.quests||[]).map(q => ({
-    type: q.type,
-    target: q.target||null,
-    goal: q.goal,
-    current: q.current,
-    done: q.done,
-    desc: q.desc,          // getter 결과를 string으로 저장
-    reward: q.reward,
-    rewardDesc: q.rewardDesc,
+    type: q.type, target: q.target||null, goal: q.goal,
+    current: q.current, done: q.done, desc: String(q.desc||''),
+    reward: q.reward, rewardDesc: q.rewardDesc,
   }));
+
+  // G에서 직렬화 불가 내부 필드 제외하고 복사
+  const {
+    _lastSavedTime, _cafeNotified, _autoPaused, _contestSNS,
+    customers,  // 손님은 저장 불필요 (휘발성)
+    ...safeG
+  } = G;
+
   const data = {
-    ...G,
-    triggeredEvents: [...G.triggeredEvents],
-    contest: safeContest,
-    quests: safeQuests,
-    savedAt: new Date().toLocaleString(),
+    ...safeG,
+    triggeredEvents: [...(G.triggeredEvents instanceof Set ? G.triggeredEvents : [])],
+    contest:  safeContest,
+    quests:   safeQuests,
+    customers: [],   // 손님 목록은 빈 배열로 저장
+    savedAt:  new Date().toLocaleString(),
   };
+
   try {
     localStorage.setItem('farmcafe_v3', JSON.stringify(data));
     updateSaveStatus(true);
   } catch(e) {
-    // 저장 실패 시 contest 제외하고 재시도
     data.contest = null;
-    try { localStorage.setItem('farmcafe_v3', JSON.stringify(data)); updateSaveStatus(true); } catch(e2) {}
+    try { localStorage.setItem('farmcafe_v3', JSON.stringify(data)); updateSaveStatus(true); } catch(e2) {
+      showNotif('⚠️ 저장 공간이 부족해요!');
+    }
   }
 }
 function saveGame() { saveToStorage(); showNotif('💾 저장 완료!'); closeModal('saveModal'); }
 
 function loadGame() {
   const raw = localStorage.getItem('farmcafe_v3');
-  if (!raw) return;
+  if (!raw) { showNotif('저장 데이터가 없어요!'); return; }
   let d;
-  try { d = JSON.parse(raw); } catch(e) { showNotif('❌ 저장 데이터가 손상됐어요. 새 게임을 시작해주세요.'); return; }
-
-  // 기본 필드 덮어쓰기
-  Object.assign(G, d);
-
-  // 직렬화 복원
-  G.triggeredEvents = new Set(Array.isArray(d.triggeredEvents) ? d.triggeredEvents : []);
-  G.triggeredContests = Array.isArray(d.triggeredContests) ? d.triggeredContests : [];
-  G.contestHistory    = Array.isArray(d.contestHistory)    ? d.contestHistory    : [];
-  G.quests            = Array.isArray(d.quests)            ? d.quests            : [];
-  G.achievements      = Array.isArray(d.achievements)      ? d.achievements      : [];
-
-  // contest 내 타이머 필드 초기화
-  if (G.contest) {
-    G.contest._judgeSpawnTimer = null;
-    G.contest._judgeQueue      = G.contest._judgeQueue || [];
+  try { d = JSON.parse(raw); } catch(e) {
+    showNotif('❌ 저장 데이터가 손상됐어요.');
+    localStorage.removeItem('farmcafe_v3');
+    showModal('nameModal'); return;
   }
 
-  // 필수 객체 안전 초기화
-  if (!G.staff)          G.staff          = {};
-  if (!G.boosters)       G.boosters       = {};
-  if (!G.staffLevels)    G.staffLevels    = {};
-  if (!G.encyclopedia)   G.encyclopedia   = {};
-  if (!G.harvestedCrops) G.harvestedCrops = {};
-  if (!G.regulars)       G.regulars       = {};
-  if (!G.inventory)      G.inventory      = {};
-  if (!G.menuSoldCount)  G.menuSoldCount  = {};
-  if (!G.plots || !Array.isArray(G.plots)) G.plots = Array(8).fill(null).map(()=>({crop:null,plantedAt:null,growTime:null,stage:'empty'}));
+  // 타이머 먼저 전부 정리 (중복 방지)
+  clearInterval(tickTimer);  tickTimer  = null;
+  clearInterval(spawnTimer); spawnTimer = null;
+  clearInterval(staffTimer); staffTimer = null;
+
+  // G 전체를 초기값으로 리셋 후 저장 데이터 덮어쓰기
+  G.brandName         = d.brandName         || '내 농장';
+  G.money             = d.money             ?? 100000;
+  G.reputation        = d.reputation        ?? 0;
+  G.day               = d.day               ?? 1;
+  G.stage             = d.stage             ?? 0;
+  G.cafeOpen          = d.cafeOpen          ?? false;
+  G.satisfaction      = d.satisfaction      ?? 0;
+  G.totalServed       = d.totalServed       ?? 0;
+  G.totalMoneyEarned  = d.totalMoneyEarned  ?? 0;
+  G.paused            = false;   // 항상 재개 상태로 시작
+  G.secondsPlayed     = d.secondsPlayed     ?? 0;
+  G.dayTimer          = d.dayTimer          ?? 0;
+  G.seasonIndex       = d.seasonIndex       ?? 0;
+  G.seasonDay         = d.seasonDay         ?? 1;
+  G.autoHarvestEnabled= d.autoHarvestEnabled ?? true;
+  G.trendMenu         = d.trendMenu         ?? null;
+  G.trendSeason       = d.trendSeason       ?? -1;
+  G.questDay          = d.questDay          ?? 0;
+  G.weather           = d.weather           ?? null;
+  G.activeStory       = d.activeStory       ?? null;
+  G.vipServed         = d.vipServed         ?? 0;
+  G.consecutiveStageUp= d.consecutiveStageUp ?? 0;
+
+  // 배열/객체 복원
+  G.plots          = Array.isArray(d.plots) && d.plots.length > 0 ? d.plots : Array(8).fill(null).map(()=>({crop:null,plantedAt:null,growTime:null,stage:'empty'}));
+  G.inventory      = d.inventory      && typeof d.inventory      === 'object' ? d.inventory      : {};
+  G.staff          = d.staff          && typeof d.staff          === 'object' ? d.staff          : {};
+  G.boosters       = d.boosters       && typeof d.boosters       === 'object' ? d.boosters       : {};
+  G.staffLevels    = d.staffLevels    && typeof d.staffLevels    === 'object' ? d.staffLevels    : {};
+  G.encyclopedia   = d.encyclopedia   && typeof d.encyclopedia   === 'object' ? d.encyclopedia   : {};
+  G.harvestedCrops = d.harvestedCrops && typeof d.harvestedCrops === 'object' ? d.harvestedCrops : {};
+  G.regulars       = d.regulars       && typeof d.regulars       === 'object' ? d.regulars       : {};
+  G.menuSoldCount  = d.menuSoldCount  && typeof d.menuSoldCount  === 'object' ? d.menuSoldCount  : {};
+  G.contestBadges  = d.contestBadges  && typeof d.contestBadges  === 'object' ? d.contestBadges  : {};
+  G.rival          = d.rival          && typeof d.rival          === 'object' ? d.rival          : {active:false,level:0,lastStealDay:0};
+
+  // Set / Array 복원
+  G.learnedRecipes    = Array.isArray(d.learnedRecipes)    ? d.learnedRecipes    : ['egg_toast'];
+  G.disabledMenus     = Array.isArray(d.disabledMenus)     ? d.disabledMenus     : [];
+  G.upgrades          = Array.isArray(d.upgrades)          ? d.upgrades          : [];
+  G.achievements      = Array.isArray(d.achievements)      ? d.achievements      : [];
+  G.quests            = Array.isArray(d.quests)            ? d.quests            : [];
+  G.triggeredContests = Array.isArray(d.triggeredContests) ? d.triggeredContests : [];
+  G.contestHistory    = Array.isArray(d.contestHistory)    ? d.contestHistory    : [];
+  G.triggeredEvents   = new Set(Array.isArray(d.triggeredEvents) ? d.triggeredEvents : []);
+  G.customers         = [];  // 손님은 초기화 (저장 안 됨)
+  G.reviews           = Array.isArray(d.reviews) ? d.reviews : [];
+
+  // contest 타이머 초기화
+  G.contest = d.contest || null;
+  if (G.contest) {
+    G.contest._judgeSpawnTimer = null;
+    G.contest._judgeQueue      = [];
+  }
 
   closeModal('saveModal');
   boot();
   addLog(`💾 불러오기 완료! (${d.savedAt||''})`);
-  if (d.savedAt) { G._lastSavedTime = Date.now(); updateSaveStatus(true); }
+  G._lastSavedTime = Date.now();
+  updateSaveStatus(true);
 }
 function exportSave() {
   const d={...G,triggeredEvents:[...G.triggeredEvents],savedAt:new Date().toLocaleString()};
@@ -2032,16 +2080,14 @@ function importSave() {
     const r=new FileReader(); r.onload=ev=>{
       try {
         const d=JSON.parse(ev.target.result);
-        Object.assign(G,d);
-        G.triggeredEvents=new Set(Array.isArray(d.triggeredEvents)?d.triggeredEvents:[]);
-        G.triggeredContests=Array.isArray(d.triggeredContests)?d.triggeredContests:[];
-        G.contestHistory=Array.isArray(d.contestHistory)?d.contestHistory:[];
-        G.quests=Array.isArray(d.quests)?d.quests:[];
-        if(!G.staff)G.staff={};
-        if(G.contest){G.contest._judgeSpawnTimer=null;G.contest._judgeQueue=G.contest._judgeQueue||[];}
-        boot(); showNotif('✅ 완료!'); closeModal('saveModal');
+        if (!d || !d.day) { showNotif('❌ 올바른 저장 파일이 아니에요'); return; }
+        // localStorage에 쓰고 loadGame으로 통일 처리
+        localStorage.setItem('farmcafe_v3', ev.target.result);
+        loadGame();
+        showNotif('✅ 불러오기 완료!');
+        closeModal('saveModal');
       }
-      catch { showNotif('❌ 파일 오류'); }
+      catch(e) { showNotif('❌ 파일 오류: ' + e.message); }
     }; r.readAsText(e.target.files[0]);
   }; inp.click();
 }
