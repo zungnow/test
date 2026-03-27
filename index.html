@@ -238,7 +238,8 @@ header{background:var(--panel);border-radius:16px;padding:10px 18px;display:flex
 .patience-text{font-size:9px;font-weight:700;text-align:right;margin-top:1px;}
 
 /* ── 달성 알림 배너 ── */
-.achieve-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),var(--sun));color:var(--espresso);border-radius:12px;padding:10px 20px;font-size:13px;font-family:'Jua',sans-serif;box-shadow:0 4px 20px rgba(212,160,23,0.4);z-index:250;animation:achieveIn 0.4s cubic-bezier(.34,1.56,.64,1),achieveOut 0.3s ease 3.5s forwards;white-space:nowrap;}
+.achieve-toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),var(--sun));color:var(--espresso);border-radius:12px;padding:10px 20px;font-size:13px;font-family:'Jua',sans-serif;box-shadow:0 4px 20px rgba(212,160,23,0.4);z-index:250;animation:achieveIn 0.4s cubic-bezier(.34,1.56,.64,1),achieveOut 0.3s ease 3.5s forwards;white-space:nowrap;}
+@media(min-width:769px){.achieve-toast{bottom:24px;}}
 @keyframes achieveIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes achieveOut{to{opacity:0;transform:translateX(-50%) translateY(20px)}}
 
@@ -1896,26 +1897,16 @@ function updateAllBanners() {
 function updateMobEventBanners() {
   ['mob-event-banner-farm','mob-event-banner-manage'].forEach(id=>{
     const el=document.getElementById(id); if (!el) return;
-    el.innerHTML='';
-    // 대회 배너 (최우선)
-    if (G.contest && G.contest.phase !== 'result') {
-      const def = getContestDef();
-      if (def) {
-        const c = G.contest;
-        const phaseLabel = {announce:`📢 D-${c.startDay-G.day} 공지`,prep:'📋 준비 기간',day:'🔥 대회 당일!'}[c.phase]||'';
-        let extra = '';
-        if (c.phase==='day'&&def.judgeCount>0) extra=` (${c.servedJudges}/${def.judgeCount}명)`;
-        if (c.phase==='day'&&def.judgeCount===0) extra=` (${(c.festRevenue||0).toLocaleString()}원)`;
-        el.innerHTML+=`<div onclick="if(G.contest){const d=getContestDef();if(d){if(G.contest.phase==='prep')showContestPrepModal(d);else showContestAnnounceModal(d);}}" style="background:linear-gradient(135deg,rgba(192,57,43,0.85),rgba(142,68,173,0.85));border-radius:7px;padding:6px 10px;font-size:11px;color:white;margin-bottom:5px;cursor:pointer;">${def.emoji} <strong>[대회] ${def.name}</strong><br><span style="font-size:10px;opacity:0.85;">${phaseLabel}${extra} — 탭해서 확인</span></div>`;
-      }
-    }
-    if (G.weather) el.innerHTML+=`<div style="background:rgba(41,128,185,0.5);border-radius:7px;padding:5px 8px;font-size:11px;color:white;margin-bottom:5px;">${G.weather.emoji} <strong>${G.weather.name}</strong> ~Day ${G.weather.endDay}</div>`;
+    // 대회 배너(.contest-banner)는 updateContestBanner()가 단독 관리 — 건드리지 않고 나머지만 제거
+    Array.from(el.children).filter(c=>!c.classList.contains('contest-banner')).forEach(c=>c.remove());
+    const appendBanner = html => el.insertAdjacentHTML('beforeend', html);
+    if (G.weather) appendBanner(`<div style="background:rgba(41,128,185,0.5);border-radius:7px;padding:5px 8px;font-size:11px;color:white;margin-bottom:5px;">${G.weather.emoji} <strong>${G.weather.name}</strong> ~Day ${G.weather.endDay}</div>`);
     if (G.quests?.length) {
       const active=G.quests.filter(q=>!q.done);
-      if (active.length) el.innerHTML+='<div style="background:rgba(108,52,131,0.5);border-radius:7px;padding:5px 8px;font-size:10px;color:white;margin-bottom:5px;"><div style="font-weight:700;margin-bottom:3px;">🎯 퀘스트</div>'+active.map(q=>{const pct=Math.min(100,Math.round(q.current/q.goal*100));return`<div>${q.desc} (${q.current}/${q.goal})<div style="height:3px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:2px;"><div style="height:100%;width:${pct}%;background:#F4C430;border-radius:2px;"></div></div></div>`;}).join('')+'</div>';
+      if (active.length) appendBanner('<div style="background:rgba(108,52,131,0.5);border-radius:7px;padding:5px 8px;font-size:10px;color:white;margin-bottom:5px;"><div style="font-weight:700;margin-bottom:3px;">🎯 퀘스트</div>'+active.map(q=>{const pct=Math.min(100,Math.round(q.current/q.goal*100));return`<div>${q.desc} (${q.current}/${q.goal})<div style="height:3px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:2px;"><div style="height:100%;width:${pct}%;background:#F4C430;border-radius:2px;"></div></div></div>`;}).join('')+'</div>');
     }
-    if (G.trendMenu && RECIPES[G.trendMenu]) el.innerHTML+=`<div style="background:rgba(192,57,43,0.5);border-radius:7px;padding:5px 8px;font-size:10px;color:white;margin-bottom:5px;">🔥 트렌드: ${RECIPES[G.trendMenu].emoji} ${RECIPES[G.trendMenu].name}</div>`;
-    if (G.rival?.active) el.innerHTML+=`<div style="background:rgba(0,0,0,0.25);border-radius:7px;padding:5px 8px;font-size:10px;color:rgba(255,248,240,0.7);margin-bottom:5px;">🏪 경쟁 가게 활성 (Lv.${G.rival.level})</div>`;
+    if (G.trendMenu && RECIPES[G.trendMenu]) appendBanner(`<div style="background:rgba(192,57,43,0.5);border-radius:7px;padding:5px 8px;font-size:10px;color:white;margin-bottom:5px;">🔥 트렌드: ${RECIPES[G.trendMenu].emoji} ${RECIPES[G.trendMenu].name}</div>`);
+    if (G.rival?.active) appendBanner(`<div style="background:rgba(0,0,0,0.25);border-radius:7px;padding:5px 8px;font-size:10px;color:rgba(255,248,240,0.7);margin-bottom:5px;">🏪 경쟁 가게 활성 (Lv.${G.rival.level})</div>`);
   });
 }
 
@@ -2772,6 +2763,7 @@ function renderBooster() {
     return {key:k, s, lv, upgCost, canUpg};
   });
 
+  // 직원 교육 섹션 제거 (관리-직원 탭과 중복)
   document.getElementById('tab-booster').innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;padding-bottom:3px;border-bottom:1px dashed rgba(200,149,108,0.3);">
       <div style="font-size:11px;font-weight:700;color:var(--espresso);">⚡ 단기 부스터</div>
@@ -2795,20 +2787,6 @@ function renderBooster() {
         }
       </div>`;
     }).join('')}
-    ${staffTraining.length > 0 ? `
-    <div style="font-size:11px;font-weight:700;color:var(--espresso);margin:8px 0 4px;padding-bottom:3px;border-bottom:1px dashed rgba(200,149,108,0.3);">🎓 직원 교육</div>
-    ${staffTraining.map(({key,s,lv,upgCost,canUpg})=>`
-      <div style="display:flex;align-items:center;gap:7px;background:rgba(107,66,38,0.06);border-radius:9px;padding:7px 9px;font-size:12px;margin-bottom:3px;">
-        <span style="font-size:18px;">${s.emoji}</span>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:11px;">${s.name} <span style="font-size:10px;color:var(--gold);">Lv.${lv}</span></div>
-          <div style="font-size:9px;color:var(--latte);">${lv===1?'기본':lv===2?'능력치 +20%':'최강화 +40%'}</div>
-        </div>
-        ${canUpg
-          ? `<button class="btn btn-sm" style="background:var(--espresso);color:white;font-size:10px;" onclick="trainStaff('${key}')" ${G.money>=upgCost?'':'disabled'}>💰${upgCost.toLocaleString()}</button>`
-          : `<span style="font-size:10px;color:var(--gold);">MAX</span>`
-        }
-      </div>`).join('')}` : `<div style="font-size:11px;color:var(--latte);text-align:center;margin-top:8px;">직원을 고용하면 교육할 수 있어요!</div>`}
   `;
 }
 
@@ -2867,6 +2845,7 @@ function trainStaff(key) {
   addLog(`🎓 ${s.emoji} ${s.name} Lv.${lv+1} 달성!`);
   updateHeader();
   renderBooster();
+  renderStaff(); // 직원 탭도 즉시 갱신
 }
 
 // ══════════════════════════════════════════
@@ -4014,8 +3993,16 @@ function spinRoulette(winnerIdx) {
   spinBtn.textContent = '🎰 돌리는 중...';
 
   const track = document.getElementById('rouletteTrack');
-  const ITEM_W = 88; // 80px width + 4px margin * 2
-  const wrapW  = track.parentElement.offsetWidth;
+  // 실제 아이템 너비 + 마진을 DOM에서 측정 (고정값 대신)
+  const firstItem = track.children[0];
+  let ITEM_W = 88;
+  if (firstItem) {
+    const cs = window.getComputedStyle(firstItem);
+    ITEM_W = firstItem.offsetWidth
+           + parseFloat(cs.marginLeft  || 0)
+           + parseFloat(cs.marginRight || 0);
+  }
+  const wrapW  = track.parentElement.clientWidth;
   const targetPos = winnerIdx * ITEM_W - (wrapW / 2) + ITEM_W / 2;
 
   let pos = 0;
